@@ -1,0 +1,18 @@
+{
+    "Index": {
+        "locale": "en",
+        "hello-1": "Beat",
+        "hello-2": "Ares",
+        "hello-3": "create Eternal wealth",
+        "welcome": "Infinite lottery game, make rewards playing against Ares God of War",
+        "btn-1": "Docs",
+        "btn-2": "GitHub",
+        "btn-3-connect": "Connect Wallet to play",
+        "btn-3-playnow": "Play Now!",
+        "span-1": "Consider Supporting",
+        "footer": "Powered By"
+    },
+    "Wallet": {
+        "connect-btn": "Connect Wallet"
+    }
+}

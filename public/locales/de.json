@@ -1,0 +1,16 @@
+{
+    "Index": {
+        "locale": "de",
+        "hello-1": "Schlag",
+        "hello-2": "Ares",
+        "hello-3": "Ewigen Reichtum schaffen",
+        "welcome": "Unendliches Lotteriespiel, machen Sie Belohnungen, indem Sie gegen Ares, den Gott des Krieges, spielen",
+        "btn-1": "Dokumente",
+        "btn-2": "GitHub",
+        "span-1": "Erwägen Sie, zu unterstützen",
+        "footer": "Powered By"
+    },
+    "Wallet": {
+        "connect-btn": "Wallet verbinden"
+    }
+}

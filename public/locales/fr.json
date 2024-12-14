@@ -1,0 +1,16 @@
+{
+    "Index": {
+        "locale": "fr",
+        "hello-1": "Battez",
+        "hello-2": "Ares",
+        "hello-3": "créer une richesse éternelle",
+        "welcome": "Jeu de loterie infini, gagnez des récompenses en jouant contre Ares, le Dieu de la Guerre",
+        "btn-1": "Docs",
+        "btn-2": "GitHub",
+        "span-1": "Envisagez de soutenir",
+        "footer": "Alimenté par"
+    },
+    "Wallet": {
+        "connect-btn": "Connecter le portefeuille"
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "Index": {
+        "locale": "es",
+        "hello-1": "Latir",
+        "hello-2": "Ares",
+        "hello-3": "crear riqueza eterna",
+        "welcome": "Juego de lotería infinito, gana recompensas jugando contra Ares, el Dios de la Guerra",
+        "btn-1": "Documentos",
+        "btn-2": "GitHub",
+        "span-1": "Considera apoyar",
+        "footer": "Desarrollado por"
+    },
+    "Wallet": {
+        "connect-btn": "Conectar billetera"
+    }
+}
