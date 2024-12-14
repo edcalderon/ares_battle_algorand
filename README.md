@@ -1,4 +1,4 @@
-## AlgorandLending ReFi Borrow By RefiMedellin.org
+## Ares Battle
 
 ## Technologies Used
 
