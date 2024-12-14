@@ -40,7 +40,7 @@ export default function Dashboard() {
 
     const handleConfirm = () => {
         console.log(`Using ability: ${selectedAbility} for ${abilityCost} Algo`);
-        onClose()
+        onClose();
     };
 
 
@@ -169,7 +169,7 @@ export default function Dashboard() {
                                         <Button color="danger" variant="light" onPress={onClose}>
                                             Close
                                         </Button>
-                                        <Button auto color="primary" onClick={handleConfirm}>
+                                        <Button color="primary" onClick={handleConfirm}>
                                             Confirm
                                         </Button>
                                     </ModalFooter>
