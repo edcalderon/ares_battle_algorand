@@ -1,24 +1,13 @@
 const createNextIntlPlugin = require('next-intl/plugin');
 const withNextIntl = createNextIntlPlugin();
 
-const withPWA = require("@ducanh2912/next-pwa").default({
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
-  reloadOnOnline: true,
-  swcMinify: true,
+const withPWA = require("next-pwa")({
   dest: "public",
-  fallbacks: {
-    //image: "/static/images/fallback.png",
-    document: "/offline", // if you want to fallback to a custom page rather than /_offline
-    // font: '/static/font/fallback.woff2',
-    // audio: ...,
-    // video: ...,
-  },
-  workboxOptions: {
-    disableDevLogs: true,
-  },
-  // ... other options you like
+  disable: process.env.NODE_ENV === "development",
+  register: true,
+  skipWaiting: true,
 });
+
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
