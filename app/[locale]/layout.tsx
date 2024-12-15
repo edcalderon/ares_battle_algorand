@@ -15,6 +15,7 @@ import {
 } from 'next-intl/server';
 import FloatingShape from '@/components/floatingShape';
 
+
 export const metadata: Metadata = {
   title: {
     default: siteConfig.name,
