@@ -1,7 +1,6 @@
 import React from 'react'
 import { Card, CardHeader, CardBody, CardFooter, Link, Image, Button, Select, SelectItem } from "@nextui-org/react";
 import { Accordion, AccordionItem } from "@nextui-org/accordion";
-import { Input } from "@nextui-org/react";
 import { useWallet as useWalletReact } from '@txnlab/use-wallet-react'
 import { AresBattleFactory } from '@/artifacts/AresBattleClient';
 import { getAlgodConfigFromEnvironment } from '../lib/getAlgoClientConfigs'
@@ -9,23 +8,15 @@ import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import toast from 'react-hot-toast'
 import { allCollection } from 'greek-mythology-data';
 import { useEffect } from 'react';
-import { BossCard } from '@/components/boss-card';
-import { ALGO_ADMIN } from '@/config/env';
-import BossTable from './boss-table';
-import type { Boss } from 'types'
-import { getAppsFromAddressByKey } from '@/lib/getAppsFromAddress';
-import { decodeGlobalState } from '@/lib/decodeGlobalState';
+import { getExplorerUrl } from '@/lib/getExplorerUrl';
 
-export const CreateBossCard = () => {
-    const { activeAddress, transactionSigner, activeAccount } = useWalletReact()
+export default function CreateBossCard() {
+    const { activeAddress, transactionSigner } = useWalletReact()
     const [loading, setLoading] = React.useState<boolean>(false)
-    const [appID, setAppID] = React.useState<number>(0)
     const [name, setName] = React.useState<string>('')
     const [rate, setRate] = React.useState<string>('')
     const [gods, setGods] = React.useState<any[]>([]);
-    const [createdApps, setCreatedApps] = React.useState<any[]>([])
-    const [createdBosses, setCreatedBosses] = React.useState<any[]>([])
-    const [loadingCreatedApps, setLoadingCreatedApps] = React.useState<boolean>(false);
+
     const sender = { signer: transactionSigner, addr: activeAddress! }
     const algodConfig = getAlgodConfigFromEnvironment()
     const algorand = AlgorandClient.fromConfig({ algodConfig })
@@ -37,50 +28,6 @@ export const CreateBossCard = () => {
         setGods(filteredData)
     }, [allCollection]);
 
-    useEffect(() => {
-        /* const getAccountInfo = async () => {
-            setLoadingCreatedApps(true);
-            if (!activeAccount) throw new Error('No selected account.')
-            const accountInfo = await algorand.client.algod.accountInformation(ALGO_ADMIN).do()
-            setCreatedApps(accountInfo['createdApps'] || []);
-            setLoadingCreatedApps(false);
-            return accountInfo
-        } */
-
-        const getAccountInfo = async () => {
-            setLoadingCreatedApps(true);
-            if (!activeAccount) throw new Error('No selected account.')
-            const accountInfo = await getAppsFromAddressByKey(ALGO_ADMIN, 'n')
-            setCreatedApps(accountInfo)
-            setLoadingCreatedApps(false);
-            console.log(accountInfo)
-            return accountInfo
-        }
-
-        getAccountInfo()
-
-    }, [activeAccount])
-
-    useEffect(() => {
-        const decodedAppsFormatedToBoss = createdApps.map(app => {
-            const decodedState = decodeGlobalState(app.params.globalState as any).decodedStates;
-            return {
-                id: parseInt(app.id),
-                name: decodedState && decodedState.length > 0
-                    ? String(decodedState.find(state => state.key === 'n')?.value).replace(/[^a-zA-Z0-9]/g, '')
-                    : 'Unknown',
-                healt: decodedState && decodedState.length > 0
-                    ? decodedState.find(state => state.key === 'hp')?.value
-                    : 'Unknown',
-                governor: decodedState && decodedState.length > 0
-                    ? decodedState.find(state => state.key === 'g')?.value
-                    : 'Unknown',
-            }
-        })
-        console.log(decodedAppsFormatedToBoss)
-
-    }, [createdApps])
-
 
     const handleCreate = async () => {
         setLoading(true)
@@ -88,14 +35,11 @@ export const CreateBossCard = () => {
         try {
 
             const { result, appClient: client } = await factory.send.create.createApplication({ sender: sender.addr, signer: sender.signer, args: [bossTotalHP, name] })
-            const explorerBaseUrl = algodConfig.network === 'TestNet'
-                ? 'https://lora.algokit.io/testnet/application/'
-                : 'https://lora.algokit.io/mainnet/application/';
 
             result && toast((t) => (
                 <span>
                     {name} created with appId: &nbsp;
-                    <a href={`${explorerBaseUrl}${result.appId}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
+                    <a href={getExplorerUrl(parseInt(result.appId.toString()))} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
                         {result.appId.toString()}
                     </a>
                 </span>
@@ -110,16 +54,6 @@ export const CreateBossCard = () => {
             setLoading(false)
         }
     }
-
-    const fakeBosses: Boss[] = [
-        { id: 1, name: 'Zeus', health: 100000, governor: 'ZeusGovernor' },
-        { id: 2, name: 'Hades', health: 80000, governor: 'HadesGovernor' },
-        { id: 3, name: 'Poseidon', health: 90000, governor: 'PoseidonGovernor' },
-        { id: 4, name: 'Ares', health: 75000, governor: 'AresGovernor' },
-        { id: 5, name: 'Athena', health: 85000, governor: 'AthenaGovernor' },
-    ];
-
-
 
     return (
         <>
@@ -159,7 +93,7 @@ export const CreateBossCard = () => {
                             </Select>
                             <Select
                                 items={[{ value: '25000' }, { value: '50000' }, { value: '100000' }]}
-                                key='inside'
+                                key='outside'
                                 label="Healt"
                                 placeholder="Select initial healt"
                                 labelPlacement='inside'
@@ -187,23 +121,6 @@ export const CreateBossCard = () => {
                     </Button>
                 </CardFooter>
             </Card>
-            {activeAccount &&
-                <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-                    <h1>Created Bosses</h1>
-                    {loadingCreatedApps ? (
-                        <p>Loading created bosses...</p>
-                    ) : createdApps.length === 0 ? (
-                        <p>There are no bosses created yet.</p>
-                    ) : (
-                        <div className="gap-2 ">
-                            {/* {createdApps.map((app: any) => (
-                                <BossCard item={app} />
-                            ))} */}
-                            <BossTable bosses={fakeBosses} />
-                        </div>
-                    )}
-                </section >
-            }
         </>
     )
 }

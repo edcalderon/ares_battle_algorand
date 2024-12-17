@@ -13,7 +13,7 @@ export const decodeGlobalState = (globalState: Array<{ key: string; value: any }
             decodedValue = algosdk.encodeAddress(new Uint8Array(Buffer.from(item.value.bytes, "base64")));
         }
 
-        if (decodedKey === "hp") {
+        if (item.value.uint) {
             decodedValue = parseInt(item.value.uint)
         }
 
