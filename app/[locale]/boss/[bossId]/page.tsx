@@ -1,14 +1,14 @@
 'use client'
-export default function PoolDetail({
+export default function BossDetail({
   params,
 }: {
-  params: { poolId: string; };
+  params: { bossId: string; };
 }) {
   return (
     <>
       <h1>
 
-        Pool {params.poolId}
+        Boss {params.bossId}
         
       </h1>
     </>

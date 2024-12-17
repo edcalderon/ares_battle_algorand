@@ -6793,6 +6793,11 @@ graphemer@^1.4.0:
   resolved "https://registry.yarnpkg.com/graphemer/-/graphemer-1.4.0.tgz#fb2f1d55e0e3a1849aeffc90c4fa0dd53a0e66c6"
   integrity sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==
 
+greek-mythology-data@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/greek-mythology-data/-/greek-mythology-data-0.2.2.tgz#b7662215329823526f19515387f0d0bcee8d7535"
+  integrity sha512-s/SKuBzLiUWBv6xJsYPQPKS479RP4VJsdcYxOa/PfrMro4lqhfF9mFsra/JXPElJyQu3cK7APVGr8aZtz1uRqw==
+
 h3@^1.10.2, h3@^1.11.1:
   version "1.11.1"
   resolved "https://registry.yarnpkg.com/h3/-/h3-1.11.1.tgz#e9414ae6f2a076a345ea07256b320edb29bab9f7"
