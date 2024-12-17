@@ -10,8 +10,6 @@ import { useTranslations } from "next-intl";
 import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl';
 
-
-
 const styles = {
   display: 'flex',
   height: '100vh',

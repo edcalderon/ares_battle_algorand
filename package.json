@@ -9,7 +9,7 @@
 		"lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix"
 	},
 	"dependencies": {
-		"@algorandfoundation/algokit-utils": "^6.0.5",
+		"@algorandfoundation/algokit-utils": "8.0.2",
 		"@blockshake/defly-connect": "^1.1.6",
 		"@daffiwallet/connect": "^1.0.3",
 		"@faker-js/faker": "^8.4.1",
@@ -42,6 +42,7 @@
 		"@typescript-eslint/eslint-plugin": "^7.10.0",
 		"@typescript-eslint/parser": "^7.10.0",
 		"@walletconnect/modal-sign-html": "^2.6.2",
+		"algosdk": "^3.0.0",
 		"autoprefixer": "10.4.19",
 		"clsx": "2.1.1",
 		"eslint": "^8.56.0",

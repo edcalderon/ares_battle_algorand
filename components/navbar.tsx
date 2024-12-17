@@ -13,7 +13,7 @@ import { link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
 import ConnectButton from "./connect-button";
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react';
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { useTranslations } from "next-intl";
@@ -25,20 +25,22 @@ import {
   Logo,
 } from "@/components/icons";
 import LocaleSwitcher from "./locale-switcher";
+import { ALGO_ADMIN } from '@/config/env';
+import { useLocale } from 'next-intl';
 
 export const Navbar = () => {
-  const { wallets, activeWallet, activeAccount } = useWallet()
-  const t = useTranslations("Index");
+  const { activeWallet, activeAccount } = useWallet()
   const { theme } = useTheme()
-  
+  const locale = useLocale();
+
 
   return (
     <NextUINavbar maxWidth="xl" position="sticky">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start" >
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
-            <Logo color={theme == 'ligth' ? '#000000' : "#e7e8e9"}/>
-            <p className="font-bold text-inherit">Ares Battle</p>
+            <Logo color={theme == 'ligth' ? '#000000' : "#e7e8e9"} />
+            <p className="font-bold text-inherit">{siteConfig.name}</p>
           </NextLink>
         </NavbarBrand>
         <ul className="hidden lg:flex gap-4 justify-start ml-2">
@@ -50,12 +52,26 @@ export const Navbar = () => {
                   "data-[active=true]:text-primary data-[active=true]:font-medium",
                 )}
                 color="foreground"
-                href={item.href}
+                href={`/${locale}/${item.href}`}
               >
                 {item.label}
               </NextLink>
             </NavbarItem>
           ))}
+          {activeWallet && activeAccount.address === ALGO_ADMIN && (
+            <NavbarItem>
+              <NextLink
+                className={clsx(
+                  linkStyles({ color: "foreground" }),
+                  "data-[active=true]:text-primary data-[active=true]:font-medium",
+                )}
+                color="foreground"
+                href={`/${locale}/admin`}
+              >
+                Admin
+              </NextLink>
+            </NavbarItem>
+          )}
         </ul>
       </NavbarContent>
 
@@ -64,17 +80,15 @@ export const Navbar = () => {
         justify="end"
       >
         <NavbarItem className="hidden sm:flex gap-2">
-          {!activeWallet && <>
-            <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
-              <TwitterIcon className="text-default-500" />
-            </Link>
-            <Link isExternal aria-label="Github" href={siteConfig.links.github}>
-              <GithubIcon className="text-default-500" />
-            </Link>
-            <Link isExternal aria-label="Discord" href={siteConfig.links.discord}>
-              <DiscordIcon className="text-default-500" />
-            </Link>
-          </>}
+          <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
+            <TwitterIcon className="text-default-500" />
+          </Link>
+          <Link isExternal aria-label="Github" href={siteConfig.links.github}>
+            <GithubIcon className="text-default-500" />
+          </Link>
+          <Link isExternal aria-label="Discord" href={siteConfig.links.discord}>
+            <DiscordIcon className="text-default-500" />
+          </Link>
           <ThemeSwitch />
           <LocaleSwitcher />
         </NavbarItem>

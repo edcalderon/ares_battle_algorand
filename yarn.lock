@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@algorandfoundation/algokit-utils@^6.0.5":
-  version "6.0.5"
-  resolved "https://registry.yarnpkg.com/@algorandfoundation/algokit-utils/-/algokit-utils-6.0.5.tgz#f5cf2d9ef345026fa7aac0d4135c9f67ee96d9c6"
-  integrity sha512-/a4pD62nQ58r6JnuNFZm9KAC9D8M7JNeAYTaIuA4TwmdLeypdUA9SD8BiaLAI8aR/GLaaPEILHnSbRSlPq9GPw==
+"@algorandfoundation/algokit-utils@8.0.2":
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/@algorandfoundation/algokit-utils/-/algokit-utils-8.0.2.tgz#4d476dc29be8b03fd8d55f09964812cfb2821402"
+  integrity sha512-Tn8lhRzalIS7cLS/GPKnPr2//+cGduuDovqpe0Mnik7+KJJ73kimDwSRWY4JPbCTASHlA2j060DGK85+il//ew==
   dependencies:
     buffer "^6.0.3"
 
@@ -5062,6 +5062,11 @@ algo-msgpack-with-bigint@^2.1.1:
   resolved "https://registry.yarnpkg.com/algo-msgpack-with-bigint/-/algo-msgpack-with-bigint-2.1.1.tgz#38bb717220525b3ff42232eefdcd9efb9ad405d6"
   integrity sha512-F1tGh056XczEaEAqu7s+hlZUDWwOBT70Eq0lfMpBP2YguSQVyxRbprLq5rELXKQOyOaixTWYhMeMQMzP0U5FoQ==
 
+algorand-msgpack@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/algorand-msgpack/-/algorand-msgpack-1.1.0.tgz#46c67c7232a3ee1bafc3c64b67fefbdb504e6560"
+  integrity sha512-08k7pBQnkaUB5p+jL7f1TRaUIlTSDE0cesFu1mD7llLao+1cAhtvvZmGE3OnisTd0xOn118QMw74SRqddqaYvw==
+
 algosdk@2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/algosdk/-/algosdk-2.7.0.tgz#6ebab130d25fc3cb4c74dce4d8753c7e86db1404"
@@ -5069,6 +5074,20 @@ algosdk@2.7.0:
   dependencies:
     algo-msgpack-with-bigint "^2.1.1"
     buffer "^6.0.3"
+    hi-base32 "^0.5.1"
+    js-sha256 "^0.9.0"
+    js-sha3 "^0.8.0"
+    js-sha512 "^0.8.0"
+    json-bigint "^1.0.0"
+    tweetnacl "^1.0.3"
+    vlq "^2.0.4"
+
+algosdk@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/algosdk/-/algosdk-3.0.0.tgz#148ff44271d8ce974e028fbd965b8fae6f1ff04d"
+  integrity sha512-PIKZ/YvbBpCudduug4KSH1CY/pTotI7/ccbUIbXKtcI9Onevl+57E+K5X4ow4gsCdysZ8zVvSLdxuCcXvsmPOw==
+  dependencies:
+    algorand-msgpack "^1.1.0"
     hi-base32 "^0.5.1"
     js-sha256 "^0.9.0"
     js-sha3 "^0.8.0"

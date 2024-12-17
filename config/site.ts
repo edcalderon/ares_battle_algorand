@@ -1,8 +1,8 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Ares Battle",
-  description: "Beat the Ares and take and eternal treasury",
+  name: "Fallen Order",
+  description: "Beat Ares God of War and take part of the Eternal treasury",
   navItems: [
     {
       label: "Dashboard",
@@ -13,11 +13,7 @@ export const siteConfig = {
     {
       label: "Dashboard",
       href: "/dashboard",
-    },
-    {
-      label: "Wallet",
-      href: "/",
-    },
+    }
   ],
   links: {
     github: "https://x.com/TheAngelOfAres",
