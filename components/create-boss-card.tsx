@@ -11,6 +11,10 @@ import { allCollection } from 'greek-mythology-data';
 import { useEffect } from 'react';
 import { BossCard } from '@/components/boss-card';
 import { ALGO_ADMIN } from '@/config/env';
+import BossTable from './boss-table';
+import type { Boss } from 'types'
+import { getAppsFromAddressByKey } from '@/lib/getAppsFromAddress';
+import { decodeGlobalState } from '@/lib/decodeGlobalState';
 
 export const CreateBossCard = () => {
     const { activeAddress, transactionSigner, activeAccount } = useWalletReact()
@@ -20,6 +24,7 @@ export const CreateBossCard = () => {
     const [rate, setRate] = React.useState<string>('')
     const [gods, setGods] = React.useState<any[]>([]);
     const [createdApps, setCreatedApps] = React.useState<any[]>([])
+    const [createdBosses, setCreatedBosses] = React.useState<any[]>([])
     const [loadingCreatedApps, setLoadingCreatedApps] = React.useState<boolean>(false);
     const sender = { signer: transactionSigner, addr: activeAddress! }
     const algodConfig = getAlgodConfigFromEnvironment()
@@ -33,18 +38,48 @@ export const CreateBossCard = () => {
     }, [allCollection]);
 
     useEffect(() => {
-        const getAccountInfo = async () => {
+        /* const getAccountInfo = async () => {
             setLoadingCreatedApps(true);
             if (!activeAccount) throw new Error('No selected account.')
             const accountInfo = await algorand.client.algod.accountInformation(ALGO_ADMIN).do()
-            console.log(accountInfo)
             setCreatedApps(accountInfo['createdApps'] || []);
             setLoadingCreatedApps(false);
             return accountInfo
+        } */
+
+        const getAccountInfo = async () => {
+            setLoadingCreatedApps(true);
+            if (!activeAccount) throw new Error('No selected account.')
+            const accountInfo = await getAppsFromAddressByKey(ALGO_ADMIN, 'n')
+            setCreatedApps(accountInfo)
+            setLoadingCreatedApps(false);
+            console.log(accountInfo)
+            return accountInfo
         }
-        console.log(createdApps)
+
         getAccountInfo()
+
     }, [activeAccount])
+
+    useEffect(() => {
+        const decodedAppsFormatedToBoss = createdApps.map(app => {
+            const decodedState = decodeGlobalState(app.params.globalState as any).decodedStates;
+            return {
+                id: parseInt(app.id),
+                name: decodedState && decodedState.length > 0
+                    ? String(decodedState.find(state => state.key === 'n')?.value).replace(/[^a-zA-Z0-9]/g, '')
+                    : 'Unknown',
+                healt: decodedState && decodedState.length > 0
+                    ? decodedState.find(state => state.key === 'hp')?.value
+                    : 'Unknown',
+                governor: decodedState && decodedState.length > 0
+                    ? decodedState.find(state => state.key === 'g')?.value
+                    : 'Unknown',
+            }
+        })
+        console.log(decodedAppsFormatedToBoss)
+
+    }, [createdApps])
 
 
     const handleCreate = async () => {
@@ -74,8 +109,17 @@ export const CreateBossCard = () => {
         } finally {
             setLoading(false)
         }
-
     }
+
+    const fakeBosses: Boss[] = [
+        { id: 1, name: 'Zeus', health: 100000, governor: 'ZeusGovernor' },
+        { id: 2, name: 'Hades', health: 80000, governor: 'HadesGovernor' },
+        { id: 3, name: 'Poseidon', health: 90000, governor: 'PoseidonGovernor' },
+        { id: 4, name: 'Ares', health: 75000, governor: 'AresGovernor' },
+        { id: 5, name: 'Athena', health: 85000, governor: 'AthenaGovernor' },
+    ];
+
+
 
     return (
         <>
@@ -151,10 +195,11 @@ export const CreateBossCard = () => {
                     ) : createdApps.length === 0 ? (
                         <p>There are no bosses created yet.</p>
                     ) : (
-                        <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
-                            {createdApps.map((app: any) => (
+                        <div className="gap-2 ">
+                            {/* {createdApps.map((app: any) => (
                                 <BossCard item={app} />
-                            ))}
+                            ))} */}
+                            <BossTable bosses={fakeBosses} />
                         </div>
                     )}
                 </section >
