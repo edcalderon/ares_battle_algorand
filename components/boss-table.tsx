@@ -17,23 +17,33 @@ import {
   DropdownItem,
   SortDescriptor,
   Selection,
+  Chip,
+  ChipProps
 } from "@nextui-org/react";
 import type { Boss } from 'types'
 import CreateBossModal from './create-boss-modal';
 import { getExplorerUrl } from "@/lib/getExplorerUrl";
 import { allCollection } from 'greek-mythology-data';
 import { VerticalDotsIcon, SearchIcon, PlusIcon } from "@/lib/icons";
+import { AresBattleClient } from '@/artifacts/AresBattleClient';
+import { getAlgodConfigFromEnvironment } from '../lib/getAlgoClientConfigs'
+import { AlgorandClient } from '@algorandfoundation/algokit-utils'
+import toast from 'react-hot-toast'
+import { useWallet as useWalletReact } from '@txnlab/use-wallet-react'
 
 export const columns = [
   { name: "ID", uid: "id", sortable: true },
   { name: "Name", uid: "name", sortable: true },
   { name: "Health", uid: "health", sortable: true },
+  { name: "Status", uid: "status", sortable: true },
+  { name: "Version", uid: "version", sortable: true },
   { name: "Actions", uid: "actions" },
 ];
 
-const INITIAL_VISIBLE_COLUMNS = ["name", "health", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["name", "health", "status", "version", "actions"];
 
 export default function BossTable({ bosses }: { bosses: Boss[] }) {
+  const { activeAddress, transactionSigner } = useWalletReact()
   const [filterValue, setFilterValue] = React.useState("");
   const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([]));
@@ -46,6 +56,9 @@ export default function BossTable({ bosses }: { bosses: Boss[] }) {
     direction: "ascending",
   });
   const hasSearchFilter = Boolean(filterValue);
+  const algodConfig = getAlgodConfigFromEnvironment()
+  const algorand = AlgorandClient.fromConfig({ algodConfig })
+  algorand.setDefaultSigner(transactionSigner)
 
   const filteredItems = React.useMemo(() => {
     return bosses.filter((boss: any) =>
@@ -154,6 +167,21 @@ export default function BossTable({ bosses }: { bosses: Boss[] }) {
     });
   }, [sortDescriptor, items]);
 
+  const handleDelete = async (itemId: number) => {
+    const client = algorand.client.getTypedAppClientById(AresBattleClient, {
+      appId: BigInt(itemId),
+    });
+    // Delete the application using a bare call
+    await client.send.clearState()
+    // Optionally, you can refresh the list of bosses or handle state updates here
+  };
+
+  const statusColorMap: Record<string, ChipProps["color"]> = {
+    ACTIVE: "success",
+    PAUSED: "danger",
+    DEFEATED: "warning",
+  };
+
   return (
     <>
       <Table
@@ -190,6 +218,16 @@ export default function BossTable({ bosses }: { bosses: Boss[] }) {
                     </TableCell>;
                   case "health":
                     return <TableCell>{item.health}</TableCell>;
+                  case "status":
+                    return (
+                      <TableCell>
+                        <Chip className="capitalize" color={statusColorMap[item?.status.toLocaleUpperCase()] || 'success'} size="sm" variant="flat">
+                          {item?.status.toLocaleLowerCase() || 'none'}
+                        </Chip>
+                      </TableCell>
+                    );
+                  case "version":
+                      return <TableCell>{item.version}</TableCell>;
                   case "actions":
                     return (
                       <TableCell>
@@ -203,7 +241,7 @@ export default function BossTable({ bosses }: { bosses: Boss[] }) {
                             <DropdownMenu>
                               <DropdownItem key="view">View</DropdownItem>
                               <DropdownItem key="edit">Edit</DropdownItem>
-                              <DropdownItem key="delete">Delete</DropdownItem>
+                              <DropdownItem key="delete" onClick={() => handleDelete(item.id)}>Delete</DropdownItem>
                             </DropdownMenu>
                           </Dropdown>
                         </div>

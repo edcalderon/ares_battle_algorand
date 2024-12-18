@@ -24,7 +24,7 @@ import { SendParams, SendSingleTransactionResult, SendAtomicTransactionComposerR
 import { Address, encodeAddress, modelsv2, OnApplicationComplete, Transaction, TransactionSigner } from 'algosdk'
 import SimulateResponse = modelsv2.SimulateResponse
 
-export const APP_SPEC: Arc56Contract = {"arcs":[],"name":"AresBattle","desc":"","structs":{},"methods":[{"name":"createApplication","args":[{"name":"hp","type":"uint64"},{"name":"name","type":"string"}],"returns":{"type":"void"},"events":[],"actions":{"create":["NoOp"],"call":[]}},{"name":"slash","desc":"Slash action to damage the boss.","args":[{"name":"user","type":"address","desc":"The user performing the action."},{"name":"damagePayment","type":"pay","desc":"The specified damage payment."}],"returns":{"type":"uint64","desc":"The actual damage dealt."},"events":[],"actions":{"create":[],"call":["NoOp"]}},{"name":"heal","desc":"Heal action to restore HP to the boss.","args":[{"name":"user","type":"address","desc":"The user performing the action."}],"returns":{"type":"uint64","desc":"The amount healed."},"events":[],"actions":{"create":[],"call":["NoOp"]}},{"name":"nuke","desc":"Nuke action to inflict damage to the boss.","args":[{"name":"user","type":"address","desc":"The user performing the action."}],"returns":{"type":"uint64","desc":"The actual damage dealt."},"events":[],"actions":{"create":[],"call":["NoOp"]}},{"name":"distributeRewards","desc":"Distribute rewards when the boss is defeated.","args":[],"returns":{"type":"void"},"events":[],"actions":{"create":[],"call":["NoOp"]}}],"state":{"schema":{"global":{"ints":2,"bytes":2},"local":{"ints":0,"bytes":0}},"keys":{"global":{"bossHP":{"key":"aHA=","keyType":"AVMString","valueType":"AVMUint64"},"totalPool":{"key":"dG90YWxQb29s","keyType":"AVMString","valueType":"AVMUint64"},"governor":{"key":"Zw==","keyType":"AVMString","valueType":"AVMBytes"},"bossName":{"key":"bg==","keyType":"AVMString","valueType":"AVMBytes"}},"local":{},"box":{}},"maps":{"global":{},"local":{},"box":{}}},"source":{"approval":"I3ByYWdtYSB2ZXJzaW9uIDEwCmludGNibG9jayAxIDMyIDAgMTAwCmJ5dGVjYmxvY2sgMHg2ODcwIDB4NzQ2Zjc0NjE2YzUwNmY2ZjZjIDB4IDB4MTUxZjdjNzUKCi8vIFRoaXMgVEVBTCB3YXMgZ2VuZXJhdGVkIGJ5IFRFQUxTY3JpcHQgdjAuMTA2LjAKLy8gaHR0cHM6Ly9naXRodWIuY29tL2FsZ29yYW5kZm91bmRhdGlvbi9URUFMU2NyaXB0CgovLyBUaGlzIGNvbnRyYWN0IGlzIGNvbXBsaWFudCB3aXRoIGFuZC9vciBpbXBsZW1lbnRzIHRoZSBmb2xsb3dpbmcgQVJDczogWyBBUkM0IF0KCi8vIFRoZSBmb2xsb3dpbmcgdGVuIGxpbmVzIG9mIFRFQUwgaGFuZGxlIGluaXRpYWwgcHJvZ3JhbSBmbG93Ci8vIFRoaXMgcGF0dGVybiBpcyB1c2VkIHRvIG1ha2UgaXQgZWFzeSBmb3IgYW55b25lIHRvIHBhcnNlIHRoZSBzdGFydCBvZiB0aGUgcHJvZ3JhbSBhbmQgZGV0ZXJtaW5lIGlmIGEgc3BlY2lmaWMgYWN0aW9uIGlzIGFsbG93ZWQKLy8gSGVyZSwgYWN0aW9uIHJlZmVycyB0byB0aGUgT25Db21wbGV0ZSBpbiBjb21iaW5hdGlvbiB3aXRoIHdoZXRoZXIgdGhlIGFwcCBpcyBiZWluZyBjcmVhdGVkIG9yIGNhbGxlZAovLyBFdmVyeSBwb3NzaWJsZSBhY3Rpb24gZm9yIHRoaXMgY29udHJhY3QgaXMgcmVwcmVzZW50ZWQgaW4gdGhlIHN3aXRjaCBzdGF0ZW1lbnQKLy8gSWYgdGhlIGFjdGlvbiBpcyBub3QgaW1wbGVtZW50ZWQgaW4gdGhlIGNvbnRyYWN0LCBpdHMgcmVzcGVjdGl2ZSBicmFuY2ggd2lsbCBiZSAiKk5PVF9JTVBMRU1FTlRFRCIgd2hpY2gganVzdCBjb250YWlucyAiZXJyIgp0eG4gQXBwbGljYXRpb25JRAohCnB1c2hpbnQgNgoqCnR4biBPbkNvbXBsZXRpb24KKwpzd2l0Y2ggKmNhbGxfTm9PcCAqTk9UX0lNUExFTUVOVEVEICpOT1RfSU1QTEVNRU5URUQgKk5PVF9JTVBMRU1FTlRFRCAqTk9UX0lNUExFTUVOVEVEICpOT1RfSU1QTEVNRU5URUQgKmNyZWF0ZV9Ob09wICpOT1RfSU1QTEVNRU5URUQgKk5PVF9JTVBMRU1FTlRFRCAqTk9UX0lNUExFTUVOVEVEICpOT1RfSU1QTEVNRU5URUQgKk5PVF9JTVBMRU1FTlRFRAoKKk5PVF9JTVBMRU1FTlRFRDoKCS8vIFRoZSByZXF1ZXN0ZWQgYWN0aW9uIGlzIG5vdCBpbXBsZW1lbnRlZCBpbiB0aGlzIGNvbnRyYWN0LiBBcmUgeW91IHVzaW5nIHRoZSBjb3JyZWN0IE9uQ29tcGxldGU/IERpZCB5b3Ugc2V0IHlvdXIgYXBwIElEPwoJZXJyCgovLyBjcmVhdGVBcHBsaWNhdGlvbih1aW50NjQsc3RyaW5nKXZvaWQKKmFiaV9yb3V0ZV9jcmVhdGVBcHBsaWNhdGlvbjoKCS8vIG5hbWU6IHN0cmluZwoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMgoJZXh0cmFjdCAyIDAKCgkvLyBocDogdWludDY0Cgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglidG9pCgoJLy8gZXhlY3V0ZSBjcmVhdGVBcHBsaWNhdGlvbih1aW50NjQsc3RyaW5nKXZvaWQKCWNhbGxzdWIgY3JlYXRlQXBwbGljYXRpb24KCWludGMgMCAvLyAxCglyZXR1cm4KCi8vIGNyZWF0ZUFwcGxpY2F0aW9uKGhwOiB1aW50NjQsIG5hbWU6IHN0cmluZyk6IHZvaWQKY3JlYXRlQXBwbGljYXRpb246Cglwcm90byAyIDAKCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjEzCgkvLyB0aGlzLmdvdmVybm9yLnZhbHVlID0gdGhpcy50eG4uc2VuZGVyCglwdXNoYnl0ZXMgMHg2NyAvLyAiZyIKCXR4biBTZW5kZXIKCWFwcF9nbG9iYWxfcHV0CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czoxNAoJLy8gdGhpcy5ib3NzSFAudmFsdWUgPSBocAoJYnl0ZWMgMCAvLyAgImhwIgoJZnJhbWVfZGlnIC0xIC8vIGhwOiB1aW50NjQKCWFwcF9nbG9iYWxfcHV0CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czoxNQoJLy8gdGhpcy5ib3NzTmFtZS52YWx1ZSA9IG5hbWUKCXB1c2hieXRlcyAweDZlIC8vICJuIgoJZnJhbWVfZGlnIC0yIC8vIG5hbWU6IHN0cmluZwoJZHVwCglsZW4KCWl0b2IKCWV4dHJhY3QgNiAyCglzd2FwCgljb25jYXQKCWFwcF9nbG9iYWxfcHV0CglyZXRzdWIKCi8vIHNsYXNoKGFkZHJlc3MscGF5KXVpbnQ2NAoqYWJpX3JvdXRlX3NsYXNoOgoJLy8gVGhlIEFCSSByZXR1cm4gcHJlZml4CglieXRlYyAzIC8vIDB4MTUxZjdjNzUKCgkvLyBkYW1hZ2VQYXltZW50OiBwYXkKCXR4biBHcm91cEluZGV4CglpbnRjIDAgLy8gMQoJLQoJZHVwCglndHhucyBUeXBlRW51bQoJaW50YyAwIC8vICBwYXkKCT09CgoJLy8gYXJndW1lbnQgMCAoZGFtYWdlUGF5bWVudCkgZm9yIHNsYXNoIG11c3QgYmUgYSBwYXkgdHJhbnNhY3Rpb24KCWFzc2VydAoKCS8vIHVzZXI6IGFkZHJlc3MKCXR4bmEgQXBwbGljYXRpb25BcmdzIDEKCWR1cAoJbGVuCglpbnRjIDEgLy8gMzIKCT09CgoJLy8gYXJndW1lbnQgMSAodXNlcikgZm9yIHNsYXNoIG11c3QgYmUgYSBhZGRyZXNzCglhc3NlcnQKCgkvLyBleGVjdXRlIHNsYXNoKGFkZHJlc3MscGF5KXVpbnQ2NAoJY2FsbHN1YiBzbGFzaAoJaXRvYgoJY29uY2F0Cglsb2cKCWludGMgMCAvLyAxCglyZXR1cm4KCi8vIHNsYXNoKHVzZXI6IEFkZHJlc3MsIGRhbWFnZVBheW1lbnQ6IFBheVR4bik6IHVpbnQ2NAovLwovLyBTbGFzaCBhY3Rpb24gdG8gZGFtYWdlIHRoZSBib3NzLgovLwovLyBAcGFyYW0gdXNlciBUaGUgdXNlciBwZXJmb3JtaW5nIHRoZSBhY3Rpb24uCi8vIEBwYXJhbSBkYW1hZ2VQYXltZW50IFRoZSBzcGVjaWZpZWQgZGFtYWdlIHBheW1lbnQuCi8vIEByZXR1cm5zIFRoZSBhY3R1YWwgZGFtYWdlIGRlYWx0LgpzbGFzaDoKCXByb3RvIDIgMQoKCS8vIFB1c2ggZW1wdHkgYnl0ZXMgYWZ0ZXIgdGhlIGZyYW1lIHBvaW50ZXIgdG8gcmVzZXJ2ZSBzcGFjZSBmb3IgbG9jYWwgdmFyaWFibGVzCglieXRlYyAyIC8vIDB4CglkdXAKCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjI5CgkvLyB2ZXJpZnlQYXlUeG4oZGFtYWdlUGF5bWVudCwgeyBhbW91bnQ6IDFfMDAwIH0pCgkvLyB2ZXJpZnkgYW1vdW50CglmcmFtZV9kaWcgLTIgLy8gZGFtYWdlUGF5bWVudDogUGF5VHhuCglndHhucyBBbW91bnQKCXB1c2hpbnQgMV8wMDAKCT09CgoJLy8gdHJhbnNhY3Rpb24gdmVyaWZpY2F0aW9uIGZhaWxlZDogeyJ0eG4iOiJkYW1hZ2VQYXltZW50IiwiZmllbGQiOiJhbW91bnQiLCJleHBlY3RlZCI6IjFfMDAwIn0KCWFzc2VydAoKCS8vIGNvbnRyYWN0cy9BcmVzQmF0dGxlLmFsZ28udHM6MzAKCS8vIGRhbWFnZSA9IGRhbWFnZVBheW1lbnQuYW1vdW50IC8gMTAwCglmcmFtZV9kaWcgLTIgLy8gZGFtYWdlUGF5bWVudDogUGF5VHhuCglndHhucyBBbW91bnQKCWludGMgMyAvLyAxMDAKCS8KCWZyYW1lX2J1cnkgMCAvLyBkYW1hZ2U6IHVpbnQ2NAoKCS8vICppZjBfY29uZGl0aW9uCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjMxCgkvLyBkYW1hZ2UgPCAxIHx8IGRhbWFnZSA+IDEwMAoJZnJhbWVfZGlnIDAgLy8gZGFtYWdlOiB1aW50NjQKCWludGMgMCAvLyAxCgk8CglkdXAKCWJueiAqc2tpcF9vcjAKCWZyYW1lX2RpZyAwIC8vIGRhbWFnZTogdWludDY0CglpbnRjIDMgLy8gMTAwCgk+Cgl8fAoKKnNraXBfb3IwOgoJYnogKmlmMF9lbmQKCgkvLyAqaWYwX2NvbnNlcXVlbnQKCS8vIERhbWFnZSBtdXN0IGJlIGJldHdlZW4gMSBhbmQgMTAwCgllcnIKCippZjBfZW5kOgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czozMgoJLy8gYWN0dWFsRGFtYWdlID0gKGRhbWFnZSAqICgxICogMSkpCglmcmFtZV9kaWcgMCAvLyBkYW1hZ2U6IHVpbnQ2NAoJaW50YyAwIC8vIDEKCSoKCWZyYW1lX2J1cnkgMSAvLyBhY3R1YWxEYW1hZ2U6IHVpbnQ2NAoKCS8vIGNvbnRyYWN0cy9BcmVzQmF0dGxlLmFsZ28udHM6MzMKCS8vIHRoaXMuYm9zc0hQLnZhbHVlIC09IGFjdHVhbERhbWFnZQoJYnl0ZWMgMCAvLyAgImhwIgoJYXBwX2dsb2JhbF9nZXQKCWZyYW1lX2RpZyAxIC8vIGFjdHVhbERhbWFnZTogdWludDY0CgktCglieXRlYyAwIC8vICAiaHAiCglzd2FwCglhcHBfZ2xvYmFsX3B1dAoKCS8vIGNvbnRyYWN0cy9BcmVzQmF0dGxlLmFsZ28udHM6MzQKCS8vIHRoaXMudG90YWxQb29sLnZhbHVlICs9IGFjdHVhbERhbWFnZQoJYnl0ZWMgMSAvLyAgInRvdGFsUG9vbCIKCWFwcF9nbG9iYWxfZ2V0CglmcmFtZV9kaWcgMSAvLyBhY3R1YWxEYW1hZ2U6IHVpbnQ2NAoJKwoJYnl0ZWMgMSAvLyAgInRvdGFsUG9vbCIKCXN3YXAKCWFwcF9nbG9iYWxfcHV0CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czozNQoJLy8gdGhpcy50cmFja0NvbnRyaWJ1dGlvbih1c2VyLCBhY3R1YWxEYW1hZ2UpCglmcmFtZV9kaWcgMSAvLyBhY3R1YWxEYW1hZ2U6IHVpbnQ2NAoJZnJhbWVfZGlnIC0xIC8vIHVzZXI6IEFkZHJlc3MKCWNhbGxzdWIgdHJhY2tDb250cmlidXRpb24KCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjM2CgkvLyByZXR1cm4gYWN0dWFsRGFtYWdlOwoJZnJhbWVfZGlnIDEgLy8gYWN0dWFsRGFtYWdlOiB1aW50NjQKCgkvLyBzZXQgdGhlIHN1YnJvdXRpbmUgcmV0dXJuIHZhbHVlCglmcmFtZV9idXJ5IDAKCgkvLyBwb3AgYWxsIGxvY2FsIHZhcmlhYmxlcyBmcm9tIHRoZSBzdGFjawoJcG9wbiAxCglyZXRzdWIKCi8vIGhlYWwoYWRkcmVzcyl1aW50NjQKKmFiaV9yb3V0ZV9oZWFsOgoJLy8gVGhlIEFCSSByZXR1cm4gcHJlZml4CglieXRlYyAzIC8vIDB4MTUxZjdjNzUKCgkvLyB1c2VyOiBhZGRyZXNzCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglkdXAKCWxlbgoJaW50YyAxIC8vIDMyCgk9PQoKCS8vIGFyZ3VtZW50IDAgKHVzZXIpIGZvciBoZWFsIG11c3QgYmUgYSBhZGRyZXNzCglhc3NlcnQKCgkvLyBleGVjdXRlIGhlYWwoYWRkcmVzcyl1aW50NjQKCWNhbGxzdWIgaGVhbAoJaXRvYgoJY29uY2F0Cglsb2cKCWludGMgMCAvLyAxCglyZXR1cm4KCi8vIGhlYWwodXNlcjogQWRkcmVzcyk6IHVpbnQ2NAovLwovLyBIZWFsIGFjdGlvbiB0byByZXN0b3JlIEhQIHRvIHRoZSBib3NzLgovLwovLyBAcGFyYW0gdXNlciBUaGUgdXNlciBwZXJmb3JtaW5nIHRoZSBhY3Rpb24uCi8vIEByZXR1cm5zIFRoZSBhbW91bnQgaGVhbGVkLgpoZWFsOgoJcHJvdG8gMSAxCgoJLy8gUHVzaCBlbXB0eSBieXRlcyBhZnRlciB0aGUgZnJhbWUgcG9pbnRlciB0byByZXNlcnZlIHNwYWNlIGZvciBsb2NhbCB2YXJpYWJsZXMKCWJ5dGVjIDIgLy8gMHgKCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjUwCgkvLyBoZWFsQW1vdW50ID0gMTAxICsgNTAKCXB1c2hpbnQgMTUxCglmcmFtZV9idXJ5IDAgLy8gaGVhbEFtb3VudDogdWludDY0CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czo1MQoJLy8gdGhpcy5ib3NzSFAudmFsdWUgKz0gaGVhbEFtb3VudAoJYnl0ZWMgMCAvLyAgImhwIgoJYXBwX2dsb2JhbF9nZXQKCWZyYW1lX2RpZyAwIC8vIGhlYWxBbW91bnQ6IHVpbnQ2NAoJKwoJYnl0ZWMgMCAvLyAgImhwIgoJc3dhcAoJYXBwX2dsb2JhbF9wdXQKCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjUyCgkvLyB0aGlzLnRvdGFsUG9vbC52YWx1ZSAtPSA4CglieXRlYyAxIC8vICAidG90YWxQb29sIgoJYXBwX2dsb2JhbF9nZXQKCXB1c2hpbnQgOAoJLQoJYnl0ZWMgMSAvLyAgInRvdGFsUG9vbCIKCXN3YXAKCWFwcF9nbG9iYWxfcHV0CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czo1MwoJLy8gdGhpcy50cmFja0NvbnRyaWJ1dGlvbih1c2VyLCBoZWFsQW1vdW50KQoJZnJhbWVfZGlnIDAgLy8gaGVhbEFtb3VudDogdWludDY0CglmcmFtZV9kaWcgLTEgLy8gdXNlcjogQWRkcmVzcwoJY2FsbHN1YiB0cmFja0NvbnRyaWJ1dGlvbgoKCS8vIGNvbnRyYWN0cy9BcmVzQmF0dGxlLmFsZ28udHM6NTQKCS8vIHJldHVybiBoZWFsQW1vdW50OwoJZnJhbWVfZGlnIDAgLy8gaGVhbEFtb3VudDogdWludDY0CgoJLy8gc2V0IHRoZSBzdWJyb3V0aW5lIHJldHVybiB2YWx1ZQoJZnJhbWVfYnVyeSAwCglyZXRzdWIKCi8vIG51a2UoYWRkcmVzcyl1aW50NjQKKmFiaV9yb3V0ZV9udWtlOgoJLy8gVGhlIEFCSSByZXR1cm4gcHJlZml4CglieXRlYyAzIC8vIDB4MTUxZjdjNzUKCgkvLyB1c2VyOiBhZGRyZXNzCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglkdXAKCWxlbgoJaW50YyAxIC8vIDMyCgk9PQoKCS8vIGFyZ3VtZW50IDAgKHVzZXIpIGZvciBudWtlIG11c3QgYmUgYSBhZGRyZXNzCglhc3NlcnQKCgkvLyBleGVjdXRlIG51a2UoYWRkcmVzcyl1aW50NjQKCWNhbGxzdWIgbnVrZQoJaXRvYgoJY29uY2F0Cglsb2cKCWludGMgMCAvLyAxCglyZXR1cm4KCi8vIG51a2UodXNlcjogQWRkcmVzcyk6IHVpbnQ2NAovLwovLyBOdWtlIGFjdGlvbiB0byBpbmZsaWN0IGRhbWFnZSB0byB0aGUgYm9zcy4KLy8KLy8gQHBhcmFtIHVzZXIgVGhlIHVzZXIgcGVyZm9ybWluZyB0aGUgYWN0aW9uLgovLyBAcmV0dXJucyBUaGUgYWN0dWFsIGRhbWFnZSBkZWFsdC4KbnVrZToKCXByb3RvIDEgMQoKCS8vIFB1c2ggZW1wdHkgYnl0ZXMgYWZ0ZXIgdGhlIGZyYW1lIHBvaW50ZXIgdG8gcmVzZXJ2ZSBzcGFjZSBmb3IgbG9jYWwgdmFyaWFibGVzCglieXRlYyAyIC8vIDB4CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czo2OAoJLy8gYWN0dWFsRGFtYWdlID0gMTAxICsgMTAwCglwdXNoaW50IDIwMQoJZnJhbWVfYnVyeSAwIC8vIGFjdHVhbERhbWFnZTogdWludDY0CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czo2OQoJLy8gdGhpcy5ib3NzSFAudmFsdWUgLT0gYWN0dWFsRGFtYWdlCglieXRlYyAwIC8vICAiaHAiCglhcHBfZ2xvYmFsX2dldAoJZnJhbWVfZGlnIDAgLy8gYWN0dWFsRGFtYWdlOiB1aW50NjQKCS0KCWJ5dGVjIDAgLy8gICJocCIKCXN3YXAKCWFwcF9nbG9iYWxfcHV0CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czo3MAoJLy8gdGhpcy50b3RhbFBvb2wudmFsdWUgKz0gMTMzCglieXRlYyAxIC8vICAidG90YWxQb29sIgoJYXBwX2dsb2JhbF9nZXQKCXB1c2hpbnQgMTMzCgkrCglieXRlYyAxIC8vICAidG90YWxQb29sIgoJc3dhcAoJYXBwX2dsb2JhbF9wdXQKCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjcxCgkvLyB0aGlzLnRyYWNrQ29udHJpYnV0aW9uKHVzZXIsIGFjdHVhbERhbWFnZSkKCWZyYW1lX2RpZyAwIC8vIGFjdHVhbERhbWFnZTogdWludDY0CglmcmFtZV9kaWcgLTEgLy8gdXNlcjogQWRkcmVzcwoJY2FsbHN1YiB0cmFja0NvbnRyaWJ1dGlvbgoKCS8vIGNvbnRyYWN0cy9BcmVzQmF0dGxlLmFsZ28udHM6NzIKCS8vIHJldHVybiBhY3R1YWxEYW1hZ2U7CglmcmFtZV9kaWcgMCAvLyBhY3R1YWxEYW1hZ2U6IHVpbnQ2NAoKCS8vIHNldCB0aGUgc3Vicm91dGluZSByZXR1cm4gdmFsdWUKCWZyYW1lX2J1cnkgMAoJcmV0c3ViCgovLyB0cmFja0NvbnRyaWJ1dGlvbih1c2VyOiBBZGRyZXNzLCBjb250cmlidXRpb246IHVpbnQ2NCk6IHZvaWQKLy8KLy8gVHJhY2sgdXNlciBjb250cmlidXRpb25zIGZvciByZXdhcmRzIGRpc3RyaWJ1dGlvbi4KLy8KLy8gQHBhcmFtIHVzZXIgVGhlIHVzZXIgcGVyZm9ybWluZyB0aGUgYWN0aW9uLgovLyBAcGFyYW0gY29udHJpYnV0aW9uIFRoZSBjb250cmlidXRpb24gYW1vdW50IChwb3NpdGl2ZSBmb3IgZGFtYWdlLCBuZWdhdGl2ZSBmb3IgaGVhbCkuCnRyYWNrQ29udHJpYnV0aW9uOgoJcHJvdG8gMiAwCgoJLy8gUHVzaCBlbXB0eSBieXRlcyBhZnRlciB0aGUgZnJhbWUgcG9pbnRlciB0byByZXNlcnZlIHNwYWNlIGZvciBsb2NhbCB2YXJpYWJsZXMKCWJ5dGVjIDIgLy8gMHgKCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjgyCgkvLyBjdXJyZW50Q29udHJpYnV0aW9uID0gdGhpcy5jb250cmlidXRpb25zKHVzZXIpLnZhbHVlIHx8IDAKCWZyYW1lX2RpZyAtMSAvLyB1c2VyOiBBZGRyZXNzCglib3hfZ2V0CgoJLy8gYm94IHZhbHVlIGRvZXMgbm90IGV4aXN0OiB0aGlzLmNvbnRyaWJ1dGlvbnModXNlcikudmFsdWUKCWFzc2VydAoJYnRvaQoJZHVwCglibnogKnNraXBfb3IxCglpbnRjIDIgLy8gMAoJfHwKCipza2lwX29yMToKCWZyYW1lX2J1cnkgMCAvLyBjdXJyZW50Q29udHJpYnV0aW9uOiB1aW50NjQKCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjgzCgkvLyB0aGlzLmNvbnRyaWJ1dGlvbnModXNlcikudmFsdWUgPSBjdXJyZW50Q29udHJpYnV0aW9uICsgY29udHJpYnV0aW9uCglmcmFtZV9kaWcgLTEgLy8gdXNlcjogQWRkcmVzcwoJZnJhbWVfZGlnIDAgLy8gY3VycmVudENvbnRyaWJ1dGlvbjogdWludDY0CglmcmFtZV9kaWcgLTIgLy8gY29udHJpYnV0aW9uOiB1aW50NjQKCSsKCWl0b2IKCWJveF9wdXQKCXJldHN1YgoKLy8gZGlzdHJpYnV0ZVJld2FyZHMoKXZvaWQKKmFiaV9yb3V0ZV9kaXN0cmlidXRlUmV3YXJkczoKCS8vIGV4ZWN1dGUgZGlzdHJpYnV0ZVJld2FyZHMoKXZvaWQKCWNhbGxzdWIgZGlzdHJpYnV0ZVJld2FyZHMKCWludGMgMCAvLyAxCglyZXR1cm4KCi8vIGRpc3RyaWJ1dGVSZXdhcmRzKCk6IHZvaWQKLy8KLy8gRGlzdHJpYnV0ZSByZXdhcmRzIHdoZW4gdGhlIGJvc3MgaXMgZGVmZWF0ZWQuCmRpc3RyaWJ1dGVSZXdhcmRzOgoJcHJvdG8gMCAwCgoJLy8gKmlmMV9jb25kaXRpb24KCS8vIGNvbnRyYWN0cy9BcmVzQmF0dGxlLmFsZ28udHM6OTAKCS8vIHRoaXMuYm9zc0hQLnZhbHVlIDw9IDAKCWJ5dGVjIDAgLy8gICJocCIKCWFwcF9nbG9iYWxfZ2V0CglpbnRjIDIgLy8gMAoJPD0KCWJ6ICppZjFfZW5kCgoJLy8gKmlmMV9jb25zZXF1ZW50CgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjk1CgkvLyB0aGlzLnJlc2V0QmF0dGxlKCkKCWNhbGxzdWIgcmVzZXRCYXR0bGUKCippZjFfZW5kOgoJcmV0c3ViCgovLyByZXNldEJhdHRsZSgpOiB2b2lkCi8vCi8vIFJlc2V0IHRoZSBiYXR0bGUgZm9yIGEgbmV3IHJvdW5kLgpyZXNldEJhdHRsZToKCXByb3RvIDAgMAoJcmV0c3ViCgoqY3JlYXRlX05vT3A6CglwdXNoYnl0ZXMgMHhiOGM1NmY1MiAvLyBtZXRob2QgImNyZWF0ZUFwcGxpY2F0aW9uKHVpbnQ2NCxzdHJpbmcpdm9pZCIKCXR4bmEgQXBwbGljYXRpb25BcmdzIDAKCW1hdGNoICphYmlfcm91dGVfY3JlYXRlQXBwbGljYXRpb24KCgkvLyB0aGlzIGNvbnRyYWN0IGRvZXMgbm90IGltcGxlbWVudCB0aGUgZ2l2ZW4gQUJJIG1ldGhvZCBmb3IgY3JlYXRlIE5vT3AKCWVycgoKKmNhbGxfTm9PcDoKCXB1c2hieXRlcyAweGIyOWVlZTQwIC8vIG1ldGhvZCAic2xhc2goYWRkcmVzcyxwYXkpdWludDY0IgoJcHVzaGJ5dGVzIDB4NTY4YzI3NDAgLy8gbWV0aG9kICJoZWFsKGFkZHJlc3MpdWludDY0IgoJcHVzaGJ5dGVzIDB4NWY4OWQ1NjIgLy8gbWV0aG9kICJudWtlKGFkZHJlc3MpdWludDY0IgoJcHVzaGJ5dGVzIDB4YjBhOTM4MDcgLy8gbWV0aG9kICJkaXN0cmlidXRlUmV3YXJkcygpdm9pZCIKCXR4bmEgQXBwbGljYXRpb25BcmdzIDAKCW1hdGNoICphYmlfcm91dGVfc2xhc2ggKmFiaV9yb3V0ZV9oZWFsICphYmlfcm91dGVfbnVrZSAqYWJpX3JvdXRlX2Rpc3RyaWJ1dGVSZXdhcmRzCgoJLy8gdGhpcyBjb250cmFjdCBkb2VzIG5vdCBpbXBsZW1lbnQgdGhlIGdpdmVuIEFCSSBtZXRob2QgZm9yIGNhbGwgTm9PcAoJZXJy","clear":"I3ByYWdtYSB2ZXJzaW9uIDEw"},"bareActions":{"create":[],"call":[]}} as unknown as Arc56Contract
+export const APP_SPEC: Arc56Contract = {"arcs":[],"name":"AresBattle","desc":"","structs":{},"methods":[{"name":"createApplication","args":[{"name":"hp","type":"uint64"},{"name":"name","type":"string"}],"returns":{"type":"void"},"events":[],"actions":{"create":["NoOp"],"call":[]}},{"name":"slash","desc":"Update global boss list.","args":[{"name":"user","type":"address"},{"name":"damagePayment","type":"pay"}],"returns":{"type":"uint64"},"events":[],"actions":{"create":[],"call":["NoOp"]}},{"name":"heal","desc":"Heal action to restore HP to the boss.","args":[{"name":"user","type":"address","desc":"The user performing the action."}],"returns":{"type":"uint64","desc":"The amount healed."},"events":[],"actions":{"create":[],"call":["NoOp"]}},{"name":"nuke","desc":"Nuke action to inflict damage to the boss.","args":[{"name":"user","type":"address","desc":"The user performing the action."}],"returns":{"type":"uint64","desc":"The actual damage dealt."},"events":[],"actions":{"create":[],"call":["NoOp"]}},{"name":"distributeRewards","desc":"Distribute rewards when the boss is defeated.","args":[],"returns":{"type":"void"},"events":[],"actions":{"create":[],"call":["NoOp"]}},{"name":"deleteApplication","args":[],"returns":{"type":"void"},"events":[],"actions":{"create":[],"call":["DeleteApplication"]}}],"state":{"schema":{"global":{"ints":2,"bytes":4},"local":{"ints":0,"bytes":0}},"keys":{"global":{"bossHP":{"key":"aHA=","keyType":"AVMString","valueType":"AVMUint64"},"totalPool":{"key":"dG90YWxQb29s","keyType":"AVMString","valueType":"AVMUint64"},"governor":{"key":"Zw==","keyType":"AVMString","valueType":"AVMBytes"},"bossName":{"key":"bg==","keyType":"AVMString","valueType":"AVMBytes"},"bossState":{"key":"cw==","keyType":"AVMString","valueType":"AVMBytes"},"contractVersion":{"key":"dg==","keyType":"AVMString","valueType":"AVMBytes"}},"local":{},"box":{}},"maps":{"global":{},"local":{},"box":{}}},"source":{"approval":"I3ByYWdtYSB2ZXJzaW9uIDEwCmludGNibG9jayAxIDAgMzIgMTAwCmJ5dGVjYmxvY2sgMHg2ODcwIDB4NzQ2Zjc0NjE2YzUwNmY2ZjZjIDB4IDB4MTUxZjdjNzUgMHg2MwoKLy8gVGhpcyBURUFMIHdhcyBnZW5lcmF0ZWQgYnkgVEVBTFNjcmlwdCB2MC4xMDYuMAovLyBodHRwczovL2dpdGh1Yi5jb20vYWxnb3JhbmRmb3VuZGF0aW9uL1RFQUxTY3JpcHQKCi8vIFRoaXMgY29udHJhY3QgaXMgY29tcGxpYW50IHdpdGggYW5kL29yIGltcGxlbWVudHMgdGhlIGZvbGxvd2luZyBBUkNzOiBbIEFSQzQgXQoKLy8gVGhlIGZvbGxvd2luZyB0ZW4gbGluZXMgb2YgVEVBTCBoYW5kbGUgaW5pdGlhbCBwcm9ncmFtIGZsb3cKLy8gVGhpcyBwYXR0ZXJuIGlzIHVzZWQgdG8gbWFrZSBpdCBlYXN5IGZvciBhbnlvbmUgdG8gcGFyc2UgdGhlIHN0YXJ0IG9mIHRoZSBwcm9ncmFtIGFuZCBkZXRlcm1pbmUgaWYgYSBzcGVjaWZpYyBhY3Rpb24gaXMgYWxsb3dlZAovLyBIZXJlLCBhY3Rpb24gcmVmZXJzIHRvIHRoZSBPbkNvbXBsZXRlIGluIGNvbWJpbmF0aW9uIHdpdGggd2hldGhlciB0aGUgYXBwIGlzIGJlaW5nIGNyZWF0ZWQgb3IgY2FsbGVkCi8vIEV2ZXJ5IHBvc3NpYmxlIGFjdGlvbiBmb3IgdGhpcyBjb250cmFjdCBpcyByZXByZXNlbnRlZCBpbiB0aGUgc3dpdGNoIHN0YXRlbWVudAovLyBJZiB0aGUgYWN0aW9uIGlzIG5vdCBpbXBsZW1lbnRlZCBpbiB0aGUgY29udHJhY3QsIGl0cyByZXNwZWN0aXZlIGJyYW5jaCB3aWxsIGJlICIqTk9UX0lNUExFTUVOVEVEIiB3aGljaCBqdXN0IGNvbnRhaW5zICJlcnIiCnR4biBBcHBsaWNhdGlvbklECiEKcHVzaGludCA2CioKdHhuIE9uQ29tcGxldGlvbgorCnN3aXRjaCAqY2FsbF9Ob09wICpOT1RfSU1QTEVNRU5URUQgKk5PVF9JTVBMRU1FTlRFRCAqTk9UX0lNUExFTUVOVEVEICpOT1RfSU1QTEVNRU5URUQgKmNhbGxfRGVsZXRlQXBwbGljYXRpb24gKmNyZWF0ZV9Ob09wICpOT1RfSU1QTEVNRU5URUQgKk5PVF9JTVBMRU1FTlRFRCAqTk9UX0lNUExFTUVOVEVEICpOT1RfSU1QTEVNRU5URUQgKk5PVF9JTVBMRU1FTlRFRAoKKk5PVF9JTVBMRU1FTlRFRDoKCS8vIFRoZSByZXF1ZXN0ZWQgYWN0aW9uIGlzIG5vdCBpbXBsZW1lbnRlZCBpbiB0aGlzIGNvbnRyYWN0LiBBcmUgeW91IHVzaW5nIHRoZSBjb3JyZWN0IE9uQ29tcGxldGU/IERpZCB5b3Ugc2V0IHlvdXIgYXBwIElEPwoJZXJyCgovLyBjcmVhdGVBcHBsaWNhdGlvbih1aW50NjQsc3RyaW5nKXZvaWQKKmFiaV9yb3V0ZV9jcmVhdGVBcHBsaWNhdGlvbjoKCS8vIG5hbWU6IHN0cmluZwoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMgoJZXh0cmFjdCAyIDAKCgkvLyBocDogdWludDY0Cgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglidG9pCgoJLy8gZXhlY3V0ZSBjcmVhdGVBcHBsaWNhdGlvbih1aW50NjQsc3RyaW5nKXZvaWQKCWNhbGxzdWIgY3JlYXRlQXBwbGljYXRpb24KCWludGMgMCAvLyAxCglyZXR1cm4KCi8vIGNyZWF0ZUFwcGxpY2F0aW9uKGhwOiB1aW50NjQsIG5hbWU6IHN0cmluZyk6IHZvaWQKY3JlYXRlQXBwbGljYXRpb246Cglwcm90byAyIDAKCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjI1CgkvLyB0aGlzLmdvdmVybm9yLnZhbHVlID0gdGhpcy50eG4uc2VuZGVyCglwdXNoYnl0ZXMgMHg2NyAvLyAiZyIKCXR4biBTZW5kZXIKCWFwcF9nbG9iYWxfcHV0CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czoyNgoJLy8gdGhpcy5ib3NzSFAudmFsdWUgPSBocAoJYnl0ZWMgMCAvLyAgImhwIgoJZnJhbWVfZGlnIC0xIC8vIGhwOiB1aW50NjQKCWFwcF9nbG9iYWxfcHV0CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czoyNwoJLy8gdGhpcy5ib3NzTmFtZS52YWx1ZSA9IG5hbWUKCXB1c2hieXRlcyAweDZlIC8vICJuIgoJZnJhbWVfZGlnIC0yIC8vIG5hbWU6IHN0cmluZwoJZHVwCglsZW4KCWl0b2IKCWV4dHJhY3QgNiAyCglzd2FwCgljb25jYXQKCWFwcF9nbG9iYWxfcHV0CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czoyOAoJLy8gdGhpcy5ib3NzU3RhdGUudmFsdWUgPSAnQUNUSVZFJwoJcHVzaGJ5dGVzIDB4NzMgLy8gInMiCglwdXNoYnl0ZXMgMHgwMDA2NDE0MzU0NDk1NjQ1CglhcHBfZ2xvYmFsX3B1dAoKCS8vIGNvbnRyYWN0cy9BcmVzQmF0dGxlLmFsZ28udHM6MjkKCS8vIHRoaXMuY29udHJhY3RWZXJzaW9uLnZhbHVlID0gJ3YxLjAuMCcKCXB1c2hieXRlcyAweDc2IC8vICJ2IgoJcHVzaGJ5dGVzIDB4MDAwNjc2MzEyZTMwMmUzMAoJYXBwX2dsb2JhbF9wdXQKCXJldHN1YgoKLy8gc2xhc2goYWRkcmVzcyxwYXkpdWludDY0CiphYmlfcm91dGVfc2xhc2g6CgkvLyBUaGUgQUJJIHJldHVybiBwcmVmaXgKCWJ5dGVjIDMgLy8gMHgxNTFmN2M3NQoKCS8vIGRhbWFnZVBheW1lbnQ6IHBheQoJdHhuIEdyb3VwSW5kZXgKCWludGMgMCAvLyAxCgktCglkdXAKCWd0eG5zIFR5cGVFbnVtCglpbnRjIDAgLy8gIHBheQoJPT0KCgkvLyBhcmd1bWVudCAwIChkYW1hZ2VQYXltZW50KSBmb3Igc2xhc2ggbXVzdCBiZSBhIHBheSB0cmFuc2FjdGlvbgoJYXNzZXJ0CgoJLy8gdXNlcjogYWRkcmVzcwoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMQoJZHVwCglsZW4KCWludGMgMiAvLyAzMgoJPT0KCgkvLyBhcmd1bWVudCAxICh1c2VyKSBmb3Igc2xhc2ggbXVzdCBiZSBhIGFkZHJlc3MKCWFzc2VydAoKCS8vIGV4ZWN1dGUgc2xhc2goYWRkcmVzcyxwYXkpdWludDY0CgljYWxsc3ViIHNsYXNoCglpdG9iCgljb25jYXQKCWxvZwoJaW50YyAwIC8vIDEKCXJldHVybgoKLy8gc2xhc2godXNlcjogQWRkcmVzcywgZGFtYWdlUGF5bWVudDogUGF5VHhuKTogdWludDY0Ci8vCi8vIFVwZGF0ZSBnbG9iYWwgYm9zcyBsaXN0LgovLwovLwovLyBTbGFzaCBhY3Rpb24gdG8gZGFtYWdlIHRoZSBib3NzLgovLwovLyBAcGFyYW0gdXNlciBUaGUgdXNlciBwZXJmb3JtaW5nIHRoZSBhY3Rpb24uCi8vIEBwYXJhbSBkYW1hZ2VQYXltZW50IFRoZSBzcGVjaWZpZWQgZGFtYWdlIHBheW1lbnQuCi8vIEByZXR1cm5zIFRoZSBhY3R1YWwgZGFtYWdlIGRlYWx0LgpzbGFzaDoKCXByb3RvIDIgMQoKCS8vIFB1c2ggZW1wdHkgYnl0ZXMgYWZ0ZXIgdGhlIGZyYW1lIHBvaW50ZXIgdG8gcmVzZXJ2ZSBzcGFjZSBmb3IgbG9jYWwgdmFyaWFibGVzCglieXRlYyAyIC8vIDB4CglkdXAKCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjQ5CgkvLyB2ZXJpZnlQYXlUeG4oZGFtYWdlUGF5bWVudCwgeyBhbW91bnQ6IDFfMDAwIH0pCgkvLyB2ZXJpZnkgYW1vdW50CglmcmFtZV9kaWcgLTIgLy8gZGFtYWdlUGF5bWVudDogUGF5VHhuCglndHhucyBBbW91bnQKCXB1c2hpbnQgMV8wMDAKCT09CgoJLy8gdHJhbnNhY3Rpb24gdmVyaWZpY2F0aW9uIGZhaWxlZDogeyJ0eG4iOiJkYW1hZ2VQYXltZW50IiwiZmllbGQiOiJhbW91bnQiLCJleHBlY3RlZCI6IjFfMDAwIn0KCWFzc2VydAoKCS8vIGNvbnRyYWN0cy9BcmVzQmF0dGxlLmFsZ28udHM6NTAKCS8vIGRhbWFnZSA9IGRhbWFnZVBheW1lbnQuYW1vdW50IC8gMTAwCglmcmFtZV9kaWcgLTIgLy8gZGFtYWdlUGF5bWVudDogUGF5VHhuCglndHhucyBBbW91bnQKCWludGMgMyAvLyAxMDAKCS8KCWZyYW1lX2J1cnkgMCAvLyBkYW1hZ2U6IHVpbnQ2NAoKCS8vICppZjBfY29uZGl0aW9uCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjUxCgkvLyBkYW1hZ2UgPCAxIHx8IGRhbWFnZSA+IDEwMAoJZnJhbWVfZGlnIDAgLy8gZGFtYWdlOiB1aW50NjQKCWludGMgMCAvLyAxCgk8CglkdXAKCWJueiAqc2tpcF9vcjAKCWZyYW1lX2RpZyAwIC8vIGRhbWFnZTogdWludDY0CglpbnRjIDMgLy8gMTAwCgk+Cgl8fAoKKnNraXBfb3IwOgoJYnogKmlmMF9lbmQKCgkvLyAqaWYwX2NvbnNlcXVlbnQKCS8vIERhbWFnZSBtdXN0IGJlIGJldHdlZW4gMSBhbmQgMTAwCgllcnIKCippZjBfZW5kOgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czo1MgoJLy8gYWN0dWFsRGFtYWdlID0gKGRhbWFnZSAqICgxICogMSkpCglmcmFtZV9kaWcgMCAvLyBkYW1hZ2U6IHVpbnQ2NAoJaW50YyAwIC8vIDEKCSoKCWZyYW1lX2J1cnkgMSAvLyBhY3R1YWxEYW1hZ2U6IHVpbnQ2NAoKCS8vIGNvbnRyYWN0cy9BcmVzQmF0dGxlLmFsZ28udHM6NTMKCS8vIHRoaXMuYm9zc0hQLnZhbHVlIC09IGFjdHVhbERhbWFnZQoJYnl0ZWMgMCAvLyAgImhwIgoJYXBwX2dsb2JhbF9nZXQKCWZyYW1lX2RpZyAxIC8vIGFjdHVhbERhbWFnZTogdWludDY0CgktCglieXRlYyAwIC8vICAiaHAiCglzd2FwCglhcHBfZ2xvYmFsX3B1dAoKCS8vIGNvbnRyYWN0cy9BcmVzQmF0dGxlLmFsZ28udHM6NTQKCS8vIHRoaXMudG90YWxQb29sLnZhbHVlICs9IGFjdHVhbERhbWFnZQoJYnl0ZWMgMSAvLyAgInRvdGFsUG9vbCIKCWFwcF9nbG9iYWxfZ2V0CglmcmFtZV9kaWcgMSAvLyBhY3R1YWxEYW1hZ2U6IHVpbnQ2NAoJKwoJYnl0ZWMgMSAvLyAgInRvdGFsUG9vbCIKCXN3YXAKCWFwcF9nbG9iYWxfcHV0CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czo1NQoJLy8gdGhpcy50cmFja0NvbnRyaWJ1dGlvbih1c2VyLCBhY3R1YWxEYW1hZ2UpCglmcmFtZV9kaWcgMSAvLyBhY3R1YWxEYW1hZ2U6IHVpbnQ2NAoJZnJhbWVfZGlnIC0xIC8vIHVzZXI6IEFkZHJlc3MKCWNhbGxzdWIgdHJhY2tDb250cmlidXRpb24KCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjU2CgkvLyByZXR1cm4gYWN0dWFsRGFtYWdlOwoJZnJhbWVfZGlnIDEgLy8gYWN0dWFsRGFtYWdlOiB1aW50NjQKCgkvLyBzZXQgdGhlIHN1YnJvdXRpbmUgcmV0dXJuIHZhbHVlCglmcmFtZV9idXJ5IDAKCgkvLyBwb3AgYWxsIGxvY2FsIHZhcmlhYmxlcyBmcm9tIHRoZSBzdGFjawoJcG9wbiAxCglyZXRzdWIKCi8vIGhlYWwoYWRkcmVzcyl1aW50NjQKKmFiaV9yb3V0ZV9oZWFsOgoJLy8gVGhlIEFCSSByZXR1cm4gcHJlZml4CglieXRlYyAzIC8vIDB4MTUxZjdjNzUKCgkvLyB1c2VyOiBhZGRyZXNzCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglkdXAKCWxlbgoJaW50YyAyIC8vIDMyCgk9PQoKCS8vIGFyZ3VtZW50IDAgKHVzZXIpIGZvciBoZWFsIG11c3QgYmUgYSBhZGRyZXNzCglhc3NlcnQKCgkvLyBleGVjdXRlIGhlYWwoYWRkcmVzcyl1aW50NjQKCWNhbGxzdWIgaGVhbAoJaXRvYgoJY29uY2F0Cglsb2cKCWludGMgMCAvLyAxCglyZXR1cm4KCi8vIGhlYWwodXNlcjogQWRkcmVzcyk6IHVpbnQ2NAovLwovLyBIZWFsIGFjdGlvbiB0byByZXN0b3JlIEhQIHRvIHRoZSBib3NzLgovLwovLyBAcGFyYW0gdXNlciBUaGUgdXNlciBwZXJmb3JtaW5nIHRoZSBhY3Rpb24uCi8vIEByZXR1cm5zIFRoZSBhbW91bnQgaGVhbGVkLgpoZWFsOgoJcHJvdG8gMSAxCgoJLy8gUHVzaCBlbXB0eSBieXRlcyBhZnRlciB0aGUgZnJhbWUgcG9pbnRlciB0byByZXNlcnZlIHNwYWNlIGZvciBsb2NhbCB2YXJpYWJsZXMKCWJ5dGVjIDIgLy8gMHgKCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjcwCgkvLyBoZWFsQW1vdW50ID0gMTAxICsgNTAKCXB1c2hpbnQgMTUxCglmcmFtZV9idXJ5IDAgLy8gaGVhbEFtb3VudDogdWludDY0CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czo3MQoJLy8gdGhpcy5ib3NzSFAudmFsdWUgKz0gaGVhbEFtb3VudAoJYnl0ZWMgMCAvLyAgImhwIgoJYXBwX2dsb2JhbF9nZXQKCWZyYW1lX2RpZyAwIC8vIGhlYWxBbW91bnQ6IHVpbnQ2NAoJKwoJYnl0ZWMgMCAvLyAgImhwIgoJc3dhcAoJYXBwX2dsb2JhbF9wdXQKCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjcyCgkvLyB0aGlzLnRvdGFsUG9vbC52YWx1ZSAtPSA4CglieXRlYyAxIC8vICAidG90YWxQb29sIgoJYXBwX2dsb2JhbF9nZXQKCXB1c2hpbnQgOAoJLQoJYnl0ZWMgMSAvLyAgInRvdGFsUG9vbCIKCXN3YXAKCWFwcF9nbG9iYWxfcHV0CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czo3MwoJLy8gdGhpcy50cmFja0NvbnRyaWJ1dGlvbih1c2VyLCBoZWFsQW1vdW50KQoJZnJhbWVfZGlnIDAgLy8gaGVhbEFtb3VudDogdWludDY0CglmcmFtZV9kaWcgLTEgLy8gdXNlcjogQWRkcmVzcwoJY2FsbHN1YiB0cmFja0NvbnRyaWJ1dGlvbgoKCS8vIGNvbnRyYWN0cy9BcmVzQmF0dGxlLmFsZ28udHM6NzQKCS8vIHJldHVybiBoZWFsQW1vdW50OwoJZnJhbWVfZGlnIDAgLy8gaGVhbEFtb3VudDogdWludDY0CgoJLy8gc2V0IHRoZSBzdWJyb3V0aW5lIHJldHVybiB2YWx1ZQoJZnJhbWVfYnVyeSAwCglyZXRzdWIKCi8vIG51a2UoYWRkcmVzcyl1aW50NjQKKmFiaV9yb3V0ZV9udWtlOgoJLy8gVGhlIEFCSSByZXR1cm4gcHJlZml4CglieXRlYyAzIC8vIDB4MTUxZjdjNzUKCgkvLyB1c2VyOiBhZGRyZXNzCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglkdXAKCWxlbgoJaW50YyAyIC8vIDMyCgk9PQoKCS8vIGFyZ3VtZW50IDAgKHVzZXIpIGZvciBudWtlIG11c3QgYmUgYSBhZGRyZXNzCglhc3NlcnQKCgkvLyBleGVjdXRlIG51a2UoYWRkcmVzcyl1aW50NjQKCWNhbGxzdWIgbnVrZQoJaXRvYgoJY29uY2F0Cglsb2cKCWludGMgMCAvLyAxCglyZXR1cm4KCi8vIG51a2UodXNlcjogQWRkcmVzcyk6IHVpbnQ2NAovLwovLyBOdWtlIGFjdGlvbiB0byBpbmZsaWN0IGRhbWFnZSB0byB0aGUgYm9zcy4KLy8KLy8gQHBhcmFtIHVzZXIgVGhlIHVzZXIgcGVyZm9ybWluZyB0aGUgYWN0aW9uLgovLyBAcmV0dXJucyBUaGUgYWN0dWFsIGRhbWFnZSBkZWFsdC4KbnVrZToKCXByb3RvIDEgMQoKCS8vIFB1c2ggZW1wdHkgYnl0ZXMgYWZ0ZXIgdGhlIGZyYW1lIHBvaW50ZXIgdG8gcmVzZXJ2ZSBzcGFjZSBmb3IgbG9jYWwgdmFyaWFibGVzCglieXRlYyAyIC8vIDB4CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czo4OAoJLy8gYWN0dWFsRGFtYWdlID0gMTAxICsgMTAwCglwdXNoaW50IDIwMQoJZnJhbWVfYnVyeSAwIC8vIGFjdHVhbERhbWFnZTogdWludDY0CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czo4OQoJLy8gdGhpcy5ib3NzSFAudmFsdWUgLT0gYWN0dWFsRGFtYWdlCglieXRlYyAwIC8vICAiaHAiCglhcHBfZ2xvYmFsX2dldAoJZnJhbWVfZGlnIDAgLy8gYWN0dWFsRGFtYWdlOiB1aW50NjQKCS0KCWJ5dGVjIDAgLy8gICJocCIKCXN3YXAKCWFwcF9nbG9iYWxfcHV0CgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czo5MAoJLy8gdGhpcy50b3RhbFBvb2wudmFsdWUgKz0gMTMzCglieXRlYyAxIC8vICAidG90YWxQb29sIgoJYXBwX2dsb2JhbF9nZXQKCXB1c2hpbnQgMTMzCgkrCglieXRlYyAxIC8vICAidG90YWxQb29sIgoJc3dhcAoJYXBwX2dsb2JhbF9wdXQKCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjkxCgkvLyB0aGlzLnRyYWNrQ29udHJpYnV0aW9uKHVzZXIsIGFjdHVhbERhbWFnZSkKCWZyYW1lX2RpZyAwIC8vIGFjdHVhbERhbWFnZTogdWludDY0CglmcmFtZV9kaWcgLTEgLy8gdXNlcjogQWRkcmVzcwoJY2FsbHN1YiB0cmFja0NvbnRyaWJ1dGlvbgoKCS8vIGNvbnRyYWN0cy9BcmVzQmF0dGxlLmFsZ28udHM6OTIKCS8vIHJldHVybiBhY3R1YWxEYW1hZ2U7CglmcmFtZV9kaWcgMCAvLyBhY3R1YWxEYW1hZ2U6IHVpbnQ2NAoKCS8vIHNldCB0aGUgc3Vicm91dGluZSByZXR1cm4gdmFsdWUKCWZyYW1lX2J1cnkgMAoJcmV0c3ViCgovLyB0cmFja0NvbnRyaWJ1dGlvbih1c2VyOiBBZGRyZXNzLCBjb250cmlidXRpb246IHVpbnQ2NCk6IHZvaWQKLy8KLy8gVHJhY2sgdXNlciBjb250cmlidXRpb25zIGZvciByZXdhcmRzIGRpc3RyaWJ1dGlvbi4KLy8KLy8gQHBhcmFtIHVzZXIgVGhlIHVzZXIgcGVyZm9ybWluZyB0aGUgYWN0aW9uLgovLyBAcGFyYW0gY29udHJpYnV0aW9uIFRoZSBjb250cmlidXRpb24gYW1vdW50IChwb3NpdGl2ZSBmb3IgZGFtYWdlLCBuZWdhdGl2ZSBmb3IgaGVhbCkuCnRyYWNrQ29udHJpYnV0aW9uOgoJcHJvdG8gMiAwCgoJLy8gUHVzaCBlbXB0eSBieXRlcyBhZnRlciB0aGUgZnJhbWUgcG9pbnRlciB0byByZXNlcnZlIHNwYWNlIGZvciBsb2NhbCB2YXJpYWJsZXMKCWJ5dGVjIDIgLy8gMHgKCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjEwMgoJLy8gY3VycmVudENvbnRyaWJ1dGlvbiA9IHRoaXMuY29udHJpYnV0aW9ucyh1c2VyKS52YWx1ZSB8fCAwCglieXRlYyA0IC8vICAiYyIKCWZyYW1lX2RpZyAtMSAvLyB1c2VyOiBBZGRyZXNzCgljb25jYXQKCWJveF9nZXQKCgkvLyBib3ggdmFsdWUgZG9lcyBub3QgZXhpc3Q6IHRoaXMuY29udHJpYnV0aW9ucyh1c2VyKS52YWx1ZQoJYXNzZXJ0CglidG9pCglkdXAKCWJueiAqc2tpcF9vcjEKCWludGMgMSAvLyAwCgl8fAoKKnNraXBfb3IxOgoJZnJhbWVfYnVyeSAwIC8vIGN1cnJlbnRDb250cmlidXRpb246IHVpbnQ2NAoKCS8vIGNvbnRyYWN0cy9BcmVzQmF0dGxlLmFsZ28udHM6MTAzCgkvLyB0aGlzLmNvbnRyaWJ1dGlvbnModXNlcikudmFsdWUgPSBjdXJyZW50Q29udHJpYnV0aW9uICsgY29udHJpYnV0aW9uCglieXRlYyA0IC8vICAiYyIKCWZyYW1lX2RpZyAtMSAvLyB1c2VyOiBBZGRyZXNzCgljb25jYXQKCWZyYW1lX2RpZyAwIC8vIGN1cnJlbnRDb250cmlidXRpb246IHVpbnQ2NAoJZnJhbWVfZGlnIC0yIC8vIGNvbnRyaWJ1dGlvbjogdWludDY0CgkrCglpdG9iCglib3hfcHV0CglyZXRzdWIKCi8vIGRpc3RyaWJ1dGVSZXdhcmRzKCl2b2lkCiphYmlfcm91dGVfZGlzdHJpYnV0ZVJld2FyZHM6CgkvLyBleGVjdXRlIGRpc3RyaWJ1dGVSZXdhcmRzKCl2b2lkCgljYWxsc3ViIGRpc3RyaWJ1dGVSZXdhcmRzCglpbnRjIDAgLy8gMQoJcmV0dXJuCgovLyBkaXN0cmlidXRlUmV3YXJkcygpOiB2b2lkCi8vCi8vIERpc3RyaWJ1dGUgcmV3YXJkcyB3aGVuIHRoZSBib3NzIGlzIGRlZmVhdGVkLgpkaXN0cmlidXRlUmV3YXJkczoKCXByb3RvIDAgMAoKCS8vICppZjFfY29uZGl0aW9uCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjExMAoJLy8gdGhpcy5ib3NzSFAudmFsdWUgPD0gMAoJYnl0ZWMgMCAvLyAgImhwIgoJYXBwX2dsb2JhbF9nZXQKCWludGMgMSAvLyAwCgk8PQoJYnogKmlmMV9lbmQKCgkvLyAqaWYxX2NvbnNlcXVlbnQKCS8vIGNvbnRyYWN0cy9BcmVzQmF0dGxlLmFsZ28udHM6MTE1CgkvLyB0aGlzLnJlc2V0QmF0dGxlKCkKCWNhbGxzdWIgcmVzZXRCYXR0bGUKCippZjFfZW5kOgoJcmV0c3ViCgovLyByZXNldEJhdHRsZSgpOiB2b2lkCi8vCi8vIFJlc2V0IHRoZSBiYXR0bGUgZm9yIGEgbmV3IHJvdW5kLgpyZXNldEJhdHRsZToKCXByb3RvIDAgMAoJcmV0c3ViCgovLyBkZWxldGVBcHBsaWNhdGlvbigpdm9pZAoqYWJpX3JvdXRlX2RlbGV0ZUFwcGxpY2F0aW9uOgoJLy8gZXhlY3V0ZSBkZWxldGVBcHBsaWNhdGlvbigpdm9pZAoJY2FsbHN1YiBkZWxldGVBcHBsaWNhdGlvbgoJaW50YyAwIC8vIDEKCXJldHVybgoKLy8gZGVsZXRlQXBwbGljYXRpb24oKTogdm9pZApkZWxldGVBcHBsaWNhdGlvbjoKCXByb3RvIDAgMAoKCS8vIGNvbnRyYWN0cy9BcmVzQmF0dGxlLmFsZ28udHM6MTI5CgkvLyBzZW5kUGF5bWVudCh7CgkvLyAgICAgICByZWNlaXZlcjogZ2xvYmFscy5jcmVhdG9yQWRkcmVzcywKCS8vICAgICAgIGNsb3NlUmVtYWluZGVyVG86IGdsb2JhbHMuY3JlYXRvckFkZHJlc3MsCgkvLyAgICAgICBhbW91bnQ6IDAsCgkvLyAgICAgfSkKCWl0eG5fYmVnaW4KCWludGMgMCAvLyAgcGF5CglpdHhuX2ZpZWxkIFR5cGVFbnVtCgoJLy8gY29udHJhY3RzL0FyZXNCYXR0bGUuYWxnby50czoxMzAKCS8vIHJlY2VpdmVyOiBnbG9iYWxzLmNyZWF0b3JBZGRyZXNzCglnbG9iYWwgQ3JlYXRvckFkZHJlc3MKCWl0eG5fZmllbGQgUmVjZWl2ZXIKCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjEzMQoJLy8gY2xvc2VSZW1haW5kZXJUbzogZ2xvYmFscy5jcmVhdG9yQWRkcmVzcwoJZ2xvYmFsIENyZWF0b3JBZGRyZXNzCglpdHhuX2ZpZWxkIENsb3NlUmVtYWluZGVyVG8KCgkvLyBjb250cmFjdHMvQXJlc0JhdHRsZS5hbGdvLnRzOjEzMgoJLy8gYW1vdW50OiAwCglpbnRjIDEgLy8gMAoJaXR4bl9maWVsZCBBbW91bnQKCgkvLyBGZWUgZmllbGQgbm90IHNldCwgZGVmYXVsdGluZyB0byAwCglpbnRjIDEgLy8gMAoJaXR4bl9maWVsZCBGZWUKCgkvLyBTdWJtaXQgaW5uZXIgdHJhbnNhY3Rpb24KCWl0eG5fc3VibWl0CglyZXRzdWIKCipjcmVhdGVfTm9PcDoKCXB1c2hieXRlcyAweGI4YzU2ZjUyIC8vIG1ldGhvZCAiY3JlYXRlQXBwbGljYXRpb24odWludDY0LHN0cmluZyl2b2lkIgoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMAoJbWF0Y2ggKmFiaV9yb3V0ZV9jcmVhdGVBcHBsaWNhdGlvbgoKCS8vIHRoaXMgY29udHJhY3QgZG9lcyBub3QgaW1wbGVtZW50IHRoZSBnaXZlbiBBQkkgbWV0aG9kIGZvciBjcmVhdGUgTm9PcAoJZXJyCgoqY2FsbF9Ob09wOgoJcHVzaGJ5dGVzIDB4YjI5ZWVlNDAgLy8gbWV0aG9kICJzbGFzaChhZGRyZXNzLHBheSl1aW50NjQiCglwdXNoYnl0ZXMgMHg1NjhjMjc0MCAvLyBtZXRob2QgImhlYWwoYWRkcmVzcyl1aW50NjQiCglwdXNoYnl0ZXMgMHg1Zjg5ZDU2MiAvLyBtZXRob2QgIm51a2UoYWRkcmVzcyl1aW50NjQiCglwdXNoYnl0ZXMgMHhiMGE5MzgwNyAvLyBtZXRob2QgImRpc3RyaWJ1dGVSZXdhcmRzKCl2b2lkIgoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMAoJbWF0Y2ggKmFiaV9yb3V0ZV9zbGFzaCAqYWJpX3JvdXRlX2hlYWwgKmFiaV9yb3V0ZV9udWtlICphYmlfcm91dGVfZGlzdHJpYnV0ZVJld2FyZHMKCgkvLyB0aGlzIGNvbnRyYWN0IGRvZXMgbm90IGltcGxlbWVudCB0aGUgZ2l2ZW4gQUJJIG1ldGhvZCBmb3IgY2FsbCBOb09wCgllcnIKCipjYWxsX0RlbGV0ZUFwcGxpY2F0aW9uOgoJcHVzaGJ5dGVzIDB4MjQ4N2MzMmMgLy8gbWV0aG9kICJkZWxldGVBcHBsaWNhdGlvbigpdm9pZCIKCXR4bmEgQXBwbGljYXRpb25BcmdzIDAKCW1hdGNoICphYmlfcm91dGVfZGVsZXRlQXBwbGljYXRpb24KCgkvLyB0aGlzIGNvbnRyYWN0IGRvZXMgbm90IGltcGxlbWVudCB0aGUgZ2l2ZW4gQUJJIG1ldGhvZCBmb3IgY2FsbCBEZWxldGVBcHBsaWNhdGlvbgoJZXJy","clear":"I3ByYWdtYSB2ZXJzaW9uIDEw"},"bareActions":{"create":[],"call":[]}} as unknown as Arc56Contract
 
 /**
  * A state record containing binary data
@@ -76,13 +76,7 @@ export type AresBattleArgs = {
       name: string
     }
     'slash(address,pay)uint64': {
-      /**
-       * The user performing the action.
-       */
       user: string
-      /**
-       * The specified damage payment.
-       */
       damagePayment: AppMethodCallTransactionArgument
     }
     'heal(address)uint64': {
@@ -98,6 +92,7 @@ export type AresBattleArgs = {
       user: string
     }
     'distributeRewards()void': Record<string, never>
+    'deleteApplication()void': Record<string, never>
   }
   /**
    * The tuple representation of the arguments for each method
@@ -108,6 +103,7 @@ export type AresBattleArgs = {
     'heal(address)uint64': [user: string]
     'nuke(address)uint64': [user: string]
     'distributeRewards()void': []
+    'deleteApplication()void': []
   }
 }
 
@@ -120,6 +116,7 @@ export type AresBattleReturns = {
   'heal(address)uint64': bigint
   'nuke(address)uint64': bigint
   'distributeRewards()void': void
+  'deleteApplication()void': void
 }
 
 /**
@@ -138,9 +135,6 @@ export type AresBattleTypes = {
     & Record<'slash(address,pay)uint64' | 'slash', {
       argsObj: AresBattleArgs['obj']['slash(address,pay)uint64']
       argsTuple: AresBattleArgs['tuple']['slash(address,pay)uint64']
-      /**
-       * The actual damage dealt.
-       */
       returns: AresBattleReturns['slash(address,pay)uint64']
     }>
     & Record<'heal(address)uint64' | 'heal', {
@@ -164,6 +158,11 @@ export type AresBattleTypes = {
       argsTuple: AresBattleArgs['tuple']['distributeRewards()void']
       returns: AresBattleReturns['distributeRewards()void']
     }>
+    & Record<'deleteApplication()void' | 'deleteApplication', {
+      argsObj: AresBattleArgs['obj']['deleteApplication()void']
+      argsTuple: AresBattleArgs['tuple']['deleteApplication()void']
+      returns: AresBattleReturns['deleteApplication()void']
+    }>
   /**
    * Defines the shape of the state of the application.
    */
@@ -174,6 +173,8 @@ export type AresBattleTypes = {
         totalPool: bigint
         governor: BinaryState
         bossName: BinaryState
+        bossState: BinaryState
+        contractVersion: BinaryState
       }
       maps: {}
     }
@@ -220,6 +221,12 @@ export type AresBattleCreateCallParams =
   | Expand<CallParams<AresBattleArgs['obj']['createApplication(uint64,string)void'] | AresBattleArgs['tuple']['createApplication(uint64,string)void']> & {method: 'createApplication'} & {onComplete?: OnApplicationComplete.NoOpOC} & CreateSchema>
   | Expand<CallParams<AresBattleArgs['obj']['createApplication(uint64,string)void'] | AresBattleArgs['tuple']['createApplication(uint64,string)void']> & {method: 'createApplication(uint64,string)void'} & {onComplete?: OnApplicationComplete.NoOpOC} & CreateSchema>
 /**
+ * Defines supported delete method params for this smart contract
+ */
+export type AresBattleDeleteCallParams =
+  | Expand<CallParams<AresBattleArgs['obj']['deleteApplication()void'] | AresBattleArgs['tuple']['deleteApplication()void']> & {method: 'deleteApplication'}>
+  | Expand<CallParams<AresBattleArgs['obj']['deleteApplication()void'] | AresBattleArgs['tuple']['deleteApplication()void']> & {method: 'deleteApplication()void'}>
+/**
  * Defines arguments required for the deploy method.
  */
 export type AresBattleDeployParams = Expand<Omit<AppFactoryDeployParams, 'createParams' | 'updateParams' | 'deleteParams'> & {
@@ -227,6 +234,10 @@ export type AresBattleDeployParams = Expand<Omit<AppFactoryDeployParams, 'create
    * Create transaction parameters to use if a create needs to be issued as part of deployment; use `method` to define ABI call (if available) or leave out for a bare call (if available)
    */
   createParams?: AresBattleCreateCallParams
+  /**
+   * Delete transaction parameters to use if a create needs to be issued as part of deployment; use `method` to define ABI call (if available) or leave out for a bare call (if available)
+   */
+  deleteParams?: AresBattleDeleteCallParams
 }>
 
 
@@ -265,9 +276,39 @@ export abstract class AresBattleParamsFactory {
   }
 
   /**
+   * Gets available delete ABI call param factories
+   */
+  static get delete() {
+    return {
+      _resolveByMethod<TParams extends AresBattleDeleteCallParams & {method: string}>(params: TParams) {
+        switch(params.method) {
+          case 'deleteApplication':
+          case 'deleteApplication()void':
+            return AresBattleParamsFactory.delete.deleteApplication(params)
+        }
+        throw new Error(`Unknown ' + verb + ' method`)
+      },
+
+      /**
+       * Constructs delete ABI call params for the AresBattle smart contract using the deleteApplication()void ABI method
+       *
+       * @param params Parameters for the call
+       * @returns An `AppClientMethodCallParams` object for the call
+       */
+      deleteApplication(params: CallParams<AresBattleArgs['obj']['deleteApplication()void'] | AresBattleArgs['tuple']['deleteApplication()void']>): AppClientMethodCallParams {
+        return {
+          ...params,
+          method: 'deleteApplication()void' as const,
+          args: Array.isArray(params.args) ? params.args : [],
+        }
+      },
+    }
+  }
+
+  /**
    * Constructs a no op call for the slash(address,pay)uint64 ABI method
    *
-   * Slash action to damage the boss.
+   * Update global boss list.
    *
    * @param params Parameters for the call
    * @returns An `AppClientMethodCallParams` object for the call
@@ -399,6 +440,7 @@ export class AresBattleFactory {
     const result = await this.appFactory.deploy({
       ...params,
       createParams: params.createParams?.method ? AresBattleParamsFactory.create._resolveByMethod(params.createParams) : params.createParams,
+      deleteParams: params.deleteParams?.method ? AresBattleParamsFactory.delete._resolveByMethod(params.deleteParams) : params.deleteParams,
     })
     return { result: result.result, appClient: new AresBattleClient(result.appClient) }
   }
@@ -419,6 +461,21 @@ export class AresBattleFactory {
        */
       createApplication: (params: CallParams<AresBattleArgs['obj']['createApplication(uint64,string)void'] | AresBattleArgs['tuple']['createApplication(uint64,string)void']> & AppClientCompilationParams & CreateSchema & {onComplete?: OnApplicationComplete.NoOpOC}) => {
         return this.appFactory.params.create(AresBattleParamsFactory.create.createApplication(params))
+      },
+    },
+
+    /**
+     * Gets available deployDelete methods
+     */
+    deployDelete: {
+      /**
+       * Deletes an existing instance of the AresBattle smart contract using the deleteApplication()void ABI method.
+       *
+       * @param params The params for the smart contract call
+       * @returns The deployDelete params
+       */
+      deleteApplication: (params: CallParams<AresBattleArgs['obj']['deleteApplication()void'] | AresBattleArgs['tuple']['deleteApplication()void']> = {args: []}) => {
+        return this.appFactory.params.deployDelete(AresBattleParamsFactory.delete.deleteApplication(params))
       },
     },
 
@@ -556,6 +613,22 @@ export class AresBattleClient {
    */
   readonly params = {
     /**
+     * Gets available delete methods
+     */
+    delete: {
+      /**
+       * Deletes an existing instance of the AresBattle smart contract using the `deleteApplication()void` ABI method.
+       *
+       * @param params The params for the smart contract call
+       * @returns The delete params
+       */
+      deleteApplication: (params: CallParams<AresBattleArgs['obj']['deleteApplication()void'] | AresBattleArgs['tuple']['deleteApplication()void']> = {args: []}) => {
+        return this.appClient.params.delete(AresBattleParamsFactory.delete.deleteApplication(params))
+      },
+
+    },
+
+    /**
      * Makes a clear_state call to an existing instance of the AresBattle smart contract.
      *
      * @param params The params for the bare (raw) call
@@ -568,10 +641,10 @@ export class AresBattleClient {
     /**
      * Makes a call to the AresBattle smart contract using the `slash(address,pay)uint64` ABI method.
      *
-     * Slash action to damage the boss.
+     * Update global boss list.
      *
      * @param params The params for the smart contract call
-     * @returns The call params: The actual damage dealt.
+     * @returns The call params
      */
     slash: (params: CallParams<AresBattleArgs['obj']['slash(address,pay)uint64'] | AresBattleArgs['tuple']['slash(address,pay)uint64']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
       return this.appClient.params.call(AresBattleParamsFactory.slash(params))
@@ -620,6 +693,22 @@ export class AresBattleClient {
    */
   readonly createTransaction = {
     /**
+     * Gets available delete methods
+     */
+    delete: {
+      /**
+       * Deletes an existing instance of the AresBattle smart contract using the `deleteApplication()void` ABI method.
+       *
+       * @param params The params for the smart contract call
+       * @returns The delete transaction
+       */
+      deleteApplication: (params: CallParams<AresBattleArgs['obj']['deleteApplication()void'] | AresBattleArgs['tuple']['deleteApplication()void']> = {args: []}) => {
+        return this.appClient.createTransaction.delete(AresBattleParamsFactory.delete.deleteApplication(params))
+      },
+
+    },
+
+    /**
      * Makes a clear_state call to an existing instance of the AresBattle smart contract.
      *
      * @param params The params for the bare (raw) call
@@ -632,10 +721,10 @@ export class AresBattleClient {
     /**
      * Makes a call to the AresBattle smart contract using the `slash(address,pay)uint64` ABI method.
      *
-     * Slash action to damage the boss.
+     * Update global boss list.
      *
      * @param params The params for the smart contract call
-     * @returns The call transaction: The actual damage dealt.
+     * @returns The call transaction
      */
     slash: (params: CallParams<AresBattleArgs['obj']['slash(address,pay)uint64'] | AresBattleArgs['tuple']['slash(address,pay)uint64']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
       return this.appClient.createTransaction.call(AresBattleParamsFactory.slash(params))
@@ -684,6 +773,23 @@ export class AresBattleClient {
    */
   readonly send = {
     /**
+     * Gets available delete methods
+     */
+    delete: {
+      /**
+       * Deletes an existing instance of the AresBattle smart contract using the `deleteApplication()void` ABI method.
+       *
+       * @param params The params for the smart contract call
+       * @returns The delete result
+       */
+      deleteApplication: async (params: CallParams<AresBattleArgs['obj']['deleteApplication()void'] | AresBattleArgs['tuple']['deleteApplication()void']> & SendParams = {args: []}) => {
+        const result = await this.appClient.send.delete(AresBattleParamsFactory.delete.deleteApplication(params))
+        return {...result, return: result.return as undefined | AresBattleReturns['deleteApplication()void']}
+      },
+
+    },
+
+    /**
      * Makes a clear_state call to an existing instance of the AresBattle smart contract.
      *
      * @param params The params for the bare (raw) call
@@ -696,10 +802,10 @@ export class AresBattleClient {
     /**
      * Makes a call to the AresBattle smart contract using the `slash(address,pay)uint64` ABI method.
      *
-     * Slash action to damage the boss.
+     * Update global boss list.
      *
      * @param params The params for the smart contract call
-     * @returns The call result: The actual damage dealt.
+     * @returns The call result
      */
     slash: async (params: CallParams<AresBattleArgs['obj']['slash(address,pay)uint64'] | AresBattleArgs['tuple']['slash(address,pay)uint64']> & SendParams & {onComplete?: OnApplicationComplete.NoOpOC}) => {
       const result = await this.appClient.send.call(AresBattleParamsFactory.slash(params))
@@ -775,6 +881,8 @@ export class AresBattleClient {
           totalPool: result.totalPool,
           governor: new BinaryStateValue(result.governor),
           bossName: new BinaryStateValue(result.bossName),
+          bossState: new BinaryStateValue(result.bossState),
+          contractVersion: new BinaryStateValue(result.contractVersion),
         }
       },
       /**
@@ -793,6 +901,14 @@ export class AresBattleClient {
        * Get the current value of the bossName key in global state
        */
       bossName: async (): Promise<BinaryState> => { return new BinaryStateValue((await this.appClient.state.global.getValue("bossName")) as Uint8Array | undefined) },
+      /**
+       * Get the current value of the bossState key in global state
+       */
+      bossState: async (): Promise<BinaryState> => { return new BinaryStateValue((await this.appClient.state.global.getValue("bossState")) as Uint8Array | undefined) },
+      /**
+       * Get the current value of the contractVersion key in global state
+       */
+      contractVersion: async (): Promise<BinaryState> => { return new BinaryStateValue((await this.appClient.state.global.getValue("contractVersion")) as Uint8Array | undefined) },
     },
   }
 
@@ -834,6 +950,15 @@ export class AresBattleClient {
         resultMappers.push(undefined)
         return this
       },
+      get delete() {
+        return {
+          deleteApplication: (params: CallParams<AresBattleArgs['obj']['deleteApplication()void'] | AresBattleArgs['tuple']['deleteApplication()void']>) => {
+            promiseChain = promiseChain.then(async () => composer.addAppDeleteMethodCall(await client.params.delete.deleteApplication(params)))
+            resultMappers.push(undefined)
+            return this
+          },
+        }
+      },
       /**
        * Add a clear state call to the AresBattle contract
        */
@@ -872,7 +997,7 @@ export type AresBattleComposer<TReturns extends [...any[]] = []> = {
   /**
    * Calls the slash(address,pay)uint64 ABI method.
    *
-   * Slash action to damage the boss.
+   * Update global boss list.
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
@@ -912,6 +1037,20 @@ export type AresBattleComposer<TReturns extends [...any[]] = []> = {
    * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
    */
   distributeRewards(params?: CallParams<AresBattleArgs['obj']['distributeRewards()void'] | AresBattleArgs['tuple']['distributeRewards()void']>): AresBattleComposer<[...TReturns, AresBattleReturns['distributeRewards()void'] | undefined]>
+
+  /**
+   * Gets available delete methods
+   */
+  readonly delete: {
+    /**
+     * Deletes an existing instance of the AresBattle smart contract using the deleteApplication()void ABI method.
+     *
+     * @param args The arguments for the smart contract call
+     * @param params Any additional parameters for the call
+     * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+     */
+    deleteApplication(params?: CallParams<AresBattleArgs['obj']['deleteApplication()void'] | AresBattleArgs['tuple']['deleteApplication()void']>): AresBattleComposer<[...TReturns, AresBattleReturns['deleteApplication()void'] | undefined]>
+  }
 
   /**
    * Makes a clear_state call to an existing instance of the AresBattle smart contract.

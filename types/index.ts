@@ -9,4 +9,6 @@ export type Boss = {
   name: string;
   health: number;
   governor: string;
+  status: string
+  version: string;
 };

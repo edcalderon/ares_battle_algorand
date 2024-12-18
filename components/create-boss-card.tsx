@@ -34,7 +34,12 @@ export default function CreateBossCard() {
         const bossTotalHP = parseInt(rate)
         try {
 
-            const { result, appClient: client } = await factory.send.create.createApplication({ sender: sender.addr, signer: sender.signer, args: [bossTotalHP, name] })
+            const { result, appClient: client } = await factory.send.create.createApplication({ 
+                sender: sender.addr, 
+                signer: sender.signer, 
+                args: [bossTotalHP, name],
+                //deletable: true,
+            })
 
             result && toast((t) => (
                 <span>

@@ -1,20 +1,11 @@
 import React from 'react'
-import { Card, CardHeader, CardBody, CardFooter, Link, Image, Button, Select, SelectItem } from "@nextui-org/react";
-import { Accordion, AccordionItem } from "@nextui-org/accordion";
-import { Input } from "@nextui-org/react";
 import { useWallet as useWalletReact } from '@txnlab/use-wallet-react'
-import { AresBattleFactory } from '@/artifacts/AresBattleClient';
-import { getAlgodConfigFromEnvironment } from '../lib/getAlgoClientConfigs'
-import { AlgorandClient } from '@algorandfoundation/algokit-utils'
-import toast from 'react-hot-toast'
-import { allCollection } from 'greek-mythology-data';
 import { useEffect } from 'react';
-import { BossCard } from '@/components/boss-card';
-import { ALGO_ADMIN } from '@/config/env';
+import { ALGO_ADMIN, CONTRACT_VERSION } from '@/config/env';
 import BossTable from './boss-table';
-import type { Boss } from 'types'
 import { getAppsFromAddressByKey } from '@/lib/getAppsFromAddress';
 import { decodeGlobalState } from '@/lib/decodeGlobalState';
+import CreateBossCard from './create-boss-card';
 
 export const CreateBossTable = () => {
     const { activeAccount } = useWalletReact()
@@ -26,13 +17,11 @@ export const CreateBossTable = () => {
         const getAccountInfo = async () => {
             setLoadingCreatedApps(true);
             if (!activeAccount) throw new Error('No selected account.')
-            const accountInfo = await getAppsFromAddressByKey(ALGO_ADMIN, 'n')
+            const accountInfo = await getAppsFromAddressByKey(ALGO_ADMIN, { key: 'v', value: CONTRACT_VERSION })
             setCreatedApps(accountInfo)
             setLoadingCreatedApps(false);
-            console.log(accountInfo)
             return accountInfo
         }
-
         getAccountInfo()
 
     }, [activeAccount])
@@ -51,6 +40,12 @@ export const CreateBossTable = () => {
                 governor: decodedState && decodedState.length > 0
                     ? decodedState.find(state => state.key === 'g')?.value
                     : 'Unknown',
+                status: decodedState && decodedState.length > 0
+                    ? decodedState.find(state => state.key === 's')?.value
+                    : 'Unknown',
+                version: decodedState && decodedState.length > 0
+                    ? decodedState.find(state => state.key === 'v')?.value
+                    : 'Unknown',
             }
         })
         setCreatedBosses(decodedAppsFormatedToBoss)
@@ -66,9 +61,15 @@ export const CreateBossTable = () => {
                     {loadingCreatedApps ? (
                         <p>Loading created bosses...</p>
                     ) : createdApps.length === 0 ? (
-                        <p>There are no bosses created yet.</p>
+                        <>
+                            <p>There are no bosses created yet.</p>
+                            <CreateBossCard />
+                        </>
+
                     ) : (
-                        <BossTable bosses={createdBosses} />
+                        <div className="overflow-x-hidden">
+                            <BossTable bosses={createdBosses} />
+                        </div>
                     )}
                 </section >
             }
