@@ -16,6 +16,8 @@ import {
 } from '@nextui-org/react';
 import { walletPretier } from '@/lib/getWalletPrettier';
 import { allCollection } from 'greek-mythology-data';
+import { getExplorerUrl } from '@/lib/getExplorerUrl';
+import { SearchIcon } from '@/lib/icons';
 
 export default function BossBattle({ id, name, governor, status, version, health }: any) {
     const { algodClient, activeAccount } = useWallet()
@@ -31,10 +33,10 @@ export default function BossBattle({ id, name, governor, status, version, health
     React.useEffect(() => {
         const filteredData = Array.from(allCollection).filter((character: any) => character.category === 'major olympians');
         setGods(filteredData)
-      }, [allCollection]);
+    }, [allCollection]);
 
 
-    
+
     const godImage = (name: string) => gods.find(god => god.name === name)?.images?.regular;
     const godDescription = (name: string) => gods.find(god => god.name === name)?.description;
     const godGender = (name: string) => gods.find(god => god.name === name)?.gender;
@@ -77,7 +79,12 @@ export default function BossBattle({ id, name, governor, status, version, health
                         <div className="grid grid-cols-2 gap-2 text-sm text-white">
                             <div>
                                 <p className="text-left"><span className="font-bold text-yellow-400">Name:</span> {name}</p>
-                                <p className="text-left"><span className="font-bold text-yellow-400">AppId:</span> {id}</p>
+                                <p className="text-left"><span className="font-bold text-yellow-400">AppId:</span>
+                                    &nbsp;
+                                    <a href={getExplorerUrl(parseInt(id.toString()))} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
+                                        {id} <SearchIcon className="inline-block h-4 w-4 mr-1" aria-hidden="true" />
+                                    </a>
+                                </p>
                             </div>
                             <div>
                                 <p className="text-left"><span className="font-bold text-yellow-400">Max Health:</span> {health}</p>
@@ -85,6 +92,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                             </div>
                             <div>
                                 <p className="text-left"><span className="font-bold text-yellow-400">Boss Status:</span>
+                                    &nbsp;
                                     <Chip color={status === 'ACTIVE' ? 'success' : status === 'PAUSED' ? 'danger' : 'warning'} className="mt-1">
                                         {status}
                                     </Chip>
