@@ -58,10 +58,7 @@ export const BossCard = ({ item }: any) => {
     };
 
     const { nValue } = decodeGlobalState(item.params.globalState);
-    const { decodedStates } = decodeGlobalState(item.params.globalState);
-    console.log(decodedStates)
 
-    // Ensure nValue is a string before removing special characters
     const cleanNValue = String(nValue).replace(/[^a-zA-Z0-9]/g, '');
     const explorerBaseUrl = algodConfig.network === 'TestNet'
         ? 'https://lora.algokit.io/testnet/application/'

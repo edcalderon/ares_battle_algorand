@@ -2,10 +2,8 @@
 import React from 'react'
 import { Link } from "@nextui-org/link";
 import { useWallet } from '@txnlab/use-wallet-react'
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, User } from "@nextui-org/react";
-import { copyToClipboard } from './copy-to-clipboard';
-import { ClipboardIcon } from '@heroicons/react/20/solid'
+import { Button, useDisclosure } from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { walletPretier } from '@/lib/getWalletPrettier';
 import { useTranslations } from "next-intl";
 import { ModalWalletInfo } from './modalWalletInfo';

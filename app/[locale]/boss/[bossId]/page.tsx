@@ -7,9 +7,7 @@ export default function BossDetail({
   return (
     <>
       <h1>
-
         Boss {params.bossId}
-        
       </h1>
     </>
   );

@@ -171,9 +171,6 @@ export default function BossTable({ bosses }: { bosses: Boss[] }) {
     const client = algorand.client.getTypedAppClientById(AresBattleClient, {
       appId: BigInt(itemId),
     });
-    // Delete the application using a bare call
-    await client.send.clearState()
-    // Optionally, you can refresh the list of bosses or handle state updates here
   };
 
   const statusColorMap: Record<string, ChipProps["color"]> = {
@@ -227,7 +224,7 @@ export default function BossTable({ bosses }: { bosses: Boss[] }) {
                       </TableCell>
                     );
                   case "version":
-                      return <TableCell>{item.version}</TableCell>;
+                    return <TableCell>{item.version}</TableCell>;
                   case "actions":
                     return (
                       <TableCell>
@@ -252,7 +249,6 @@ export default function BossTable({ bosses }: { bosses: Boss[] }) {
                       <a href={getExplorerUrl(item.id)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
                         {item.id.toString()}
                       </a>
-
                     </TableCell>;
                 }
               }}

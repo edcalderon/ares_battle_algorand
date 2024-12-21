@@ -6,11 +6,11 @@ import BossTable from './boss-table';
 import { getAppsFromAddressByKey } from '@/lib/getAppsFromAddress';
 import { decodeGlobalState } from '@/lib/decodeGlobalState';
 import CreateBossCard from './create-boss-card';
+import { useDecodedBosses } from '@/hooks/useDecodedBosses';
 
 export const CreateBossTable = () => {
     const { activeAccount } = useWalletReact()
     const [createdApps, setCreatedApps] = React.useState<any[]>([])
-    const [createdBosses, setCreatedBosses] = React.useState<any[]>([])
     const [loadingCreatedApps, setLoadingCreatedApps] = React.useState<boolean>(false);
 
     useEffect(() => {
@@ -26,32 +26,7 @@ export const CreateBossTable = () => {
 
     }, [activeAccount])
 
-    useEffect(() => {
-        const decodedAppsFormatedToBoss = createdApps.map(app => {
-            const decodedState = decodeGlobalState(app.params.globalState as any).decodedStates;
-            return {
-                id: parseInt(app.id),
-                name: decodedState && decodedState.length > 0
-                    ? String(decodedState.find(state => state.key === 'n')?.value).replace(/[^a-zA-Z0-9]/g, '')
-                    : 'Unknown',
-                health: decodedState && decodedState.length > 0
-                    ? decodedState.find(state => state.key === 'hp')?.value
-                    : 'Unknown',
-                governor: decodedState && decodedState.length > 0
-                    ? decodedState.find(state => state.key === 'g')?.value
-                    : 'Unknown',
-                status: decodedState && decodedState.length > 0
-                    ? decodedState.find(state => state.key === 's')?.value
-                    : 'Unknown',
-                version: decodedState && decodedState.length > 0
-                    ? decodedState.find(state => state.key === 'v')?.value
-                    : 'Unknown',
-            }
-        })
-        setCreatedBosses(decodedAppsFormatedToBoss)
-
-    }, [createdApps])
-
+    const createdBosses = useDecodedBosses(createdApps);
 
     return (
         <>
