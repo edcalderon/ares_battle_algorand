@@ -49,6 +49,7 @@ export default function CreateBossCard() {
                     </a>
                 </span>
             ));
+
         } catch (e) {
             toast.error(`${e}`, {
                 id: 'txn',

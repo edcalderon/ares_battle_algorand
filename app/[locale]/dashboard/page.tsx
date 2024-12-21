@@ -12,8 +12,6 @@ export default function Dashboard() {
     const [loadingCreatedApps, setLoadingCreatedApps] = React.useState<boolean>(false);
     const [currentIndex, setCurrentIndex] = React.useState(0);
 
-
-
     useEffect(() => {
         const getAccountInfo = async () => {
             setLoadingCreatedApps(true);

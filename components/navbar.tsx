@@ -58,7 +58,7 @@ export const Navbar = () => {
               </NextLink>
             </NavbarItem>
           ))}
-          {activeWallet && activeAccount.address === ALGO_ADMIN && (
+          {activeWallet && ALGO_ADMIN.split(',').includes(activeAccount.address) && (
             <NavbarItem>
               <NextLink
                 className={clsx(
