@@ -4,7 +4,7 @@ import { Accordion, AccordionItem } from "@nextui-org/accordion";
 import { useWallet as useWalletReact } from '@txnlab/use-wallet-react'
 import { AresBattleFactory } from '@/artifacts/AresBattleClient';
 import { getAlgodConfigFromEnvironment } from '../lib/getAlgoClientConfigs'
-import { AlgorandClient } from '@algorandfoundation/algokit-utils'
+import { AlgorandClient, microAlgos } from '@algorandfoundation/algokit-utils'
 import toast from 'react-hot-toast'
 import { allCollection } from 'greek-mythology-data';
 import { useEffect } from 'react';
@@ -16,7 +16,6 @@ export default function CreateBossCard() {
     const [name, setName] = React.useState<string>('')
     const [rate, setRate] = React.useState<string>('')
     const [gods, setGods] = React.useState<any[]>([]);
-
     const sender = { signer: transactionSigner, addr: activeAddress! }
     const algodConfig = getAlgodConfigFromEnvironment()
     const algorand = AlgorandClient.fromConfig({ algodConfig })
@@ -34,12 +33,16 @@ export default function CreateBossCard() {
         const bossTotalHP = parseInt(rate)
         try {
 
-            const { result, appClient: client } = await factory.send.create.createApplication({ 
-                sender: sender.addr, 
-                signer: sender.signer, 
+            const { result, appClient: client } = await factory.send.create.createApplication({
+                sender: sender.addr,
+                signer: sender.signer,
                 args: [bossTotalHP, name],
                 //deletable: true,
             })
+
+            if(result) {
+                await client.appClient.fundAppAccount({ amount: microAlgos(1_000_000), sender: sender.addr.toString() })
+            }
 
             result && toast((t) => (
                 <span>

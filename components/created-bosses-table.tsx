@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { ALGO_ADMIN, CONTRACT_VERSION } from '@/config/env';
 import BossTable from './boss-table';
 import { getAppsFromAddressByKey } from '@/lib/getAppsFromAddress';
-import { decodeGlobalState } from '@/lib/decodeGlobalState';
 import CreateBossCard from './create-boss-card';
 import { useDecodedBosses } from '@/hooks/useDecodedBosses';
 
@@ -23,7 +22,6 @@ export const CreateBossTable = () => {
             return accountInfo
         }
         getAccountInfo()
-
     }, [activeAccount])
 
     const createdBosses = useDecodedBosses(createdApps);
@@ -40,7 +38,6 @@ export const CreateBossTable = () => {
                             <p>There are no bosses created yet.</p>
                             <CreateBossCard />
                         </>
-
                     ) : (
                         <div className="overflow-x-hidden">
                             <BossTable bosses={createdBosses} />

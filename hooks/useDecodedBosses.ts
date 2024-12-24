@@ -15,6 +15,9 @@ export const useDecodedBosses = (createdApps: any[]) => {
                 health: decodedState && decodedState.length > 0
                     ? decodedState.find(state => state.key === 'hp')?.value
                     : 'Unknown',
+                maxHealth: decodedState && decodedState.length > 0
+                    ? decodedState.find(state => state.key === 'thp')?.value
+                    : 'Unknown',    
                 governor: decodedState && decodedState.length > 0
                     ? decodedState.find(state => state.key === 'g')?.value
                     : 'Unknown',

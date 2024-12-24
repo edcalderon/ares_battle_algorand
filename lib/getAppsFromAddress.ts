@@ -10,7 +10,7 @@ export const getAllAppsFromAddress = async (Address: string) => {
 
 }
 
-export const getAppsFromAddressByKey = async (Address: string, keyValue: { key: string, value: any }) => {
+export const getAppsFromAddressByKey = async (Address: string, keyValue: { key: string, value: string }) => {
     const addresses = Address.split(",");
     const allFilteredApps = [];
 
@@ -18,10 +18,15 @@ export const getAppsFromAddressByKey = async (Address: string, keyValue: { key: 
         const accountInfo = await algorand.client.algod.accountInformation(addr.trim()).do();
         const allApps = accountInfo['createdApps'];
 
-        const filtered = (allApps || []).filter(app => {
+        let filtered = (allApps || []).filter(app => {
             const globalState = app.params.globalState;
-            return globalState ? decodeGlobalState(globalState as any).decodedStates.some(state => state.key === keyValue.key) : false;
+            //return globalState ? decodeGlobalState(globalState as any).decodedStates.some(state => state.key === keyValue.key) : false; //all contracts with key v
+            // filter by version
+            return globalState ? decodeGlobalState(globalState as any).decodedStates.some(state => state.key === keyValue.key && state.value.toString().split('v')[1] === keyValue.value.split('v')[1]) : false;
         });
+
+        console.log(filtered)
+        
         
         allFilteredApps.push(...filtered);
     }

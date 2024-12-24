@@ -18,9 +18,13 @@ import { walletPretier } from '@/lib/getWalletPrettier';
 import { allCollection } from 'greek-mythology-data';
 import { getExplorerUrl } from '@/lib/getExplorerUrl';
 import { SearchIcon } from '@/lib/icons';
+import { AresBattleClient } from '@/artifacts/AresBattleClient';
+import { getAlgodConfigFromEnvironment } from '../lib/getAlgoClientConfigs'
+import { AlgorandClient, microAlgos } from '@algorandfoundation/algokit-utils'
+import algosdk from 'algosdk'
 
-export default function BossBattle({ id, name, governor, status, version, health }: any) {
-    const { algodClient, activeAccount } = useWallet()
+export default function BossBattle({ id, name, governor, status, version, health, maxHealth }: any) {
+    const { algodClient, activeAccount, transactionSigner, activeAddress } = useWallet()
     const [createdApps, setCreatedApps] = useState([])
     const [chosenAbility, setChosenAbility] = useState('')
     const [slashAbilityPoints, setSlashAbilityPoints] = useState(1);
@@ -28,14 +32,19 @@ export default function BossBattle({ id, name, governor, status, version, health
     const [abilityCost, setAbilityCost] = useState(0);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [gods, setGods] = React.useState<any[]>([]);
+    const algodConfig = getAlgodConfigFromEnvironment()
+    const algorand = AlgorandClient.fromConfig({ algodConfig })
+    const sender = { signer: transactionSigner, addr: activeAddress! }
+    algorand.setDefaultSigner(transactionSigner)
 
+    const client = algorand.client.getTypedAppClientById(AresBattleClient, {
+        appId: BigInt(id),
+    })
 
     React.useEffect(() => {
         const filteredData = Array.from(allCollection).filter((character: any) => character.category === 'major olympians');
         setGods(filteredData)
     }, [allCollection]);
-
-
 
     const godImage = (name: string) => gods.find(god => god.name === name)?.images?.regular;
     const godDescription = (name: string) => gods.find(god => god.name === name)?.description;
@@ -43,7 +52,6 @@ export default function BossBattle({ id, name, governor, status, version, health
     const godGreekName = (name: string) => gods.find(god => god.name === name)?.greekName;
     const godCategory = (name: string) => gods.find(god => god.name === name)?.category;
     const godRomanName = (name: string) => gods.find(god => god.name === name)?.romanName;
-
 
     useEffect(() => {
         const getAccountInfo = async () => {
@@ -62,8 +70,33 @@ export default function BossBattle({ id, name, governor, status, version, health
         onOpen();
     };
 
-    const handleConfirm = () => {
-        console.log(`Using ability: ${selectedAbility} for ${abilityCost} Algo`);
+    const handleConfirm = async () => {
+        switch (selectedAbility) {
+            case 'SLASH':
+                console.log(`Using ability: SLASH for ${abilityCost} Algo`);
+
+                const ptxn = await algorand.createTransaction.payment({
+                    sender: sender.addr.toString(),
+                    receiver: client.appAddress.toString(),
+                    amount: microAlgos(1_000) ,
+                  })
+
+                const result = await client.send.slash({ args: { user: sender.addr.toString(), damagePayment: ptxn, times: BigInt(1) },  sender: sender.addr.toString() /* ,  boxReferences: ['V'] */})
+
+                console.log(result)
+
+                break;
+            case 'HEAL':
+                console.log(`Using ability: HEAL for ${abilityCost} Algo`);
+                // Add logic for HEAL ability here
+                break;
+            case 'NUKE!':
+                console.log(`Using ability: NUKE! for ${abilityCost} Algo`);
+                // Add logic for NUKE! ability here
+                break;
+            default:
+                console.log('Unknown ability');
+        }
         onClose();
     };
 
@@ -72,7 +105,7 @@ export default function BossBattle({ id, name, governor, status, version, health
         <>
             <div className="text-center">
                 <p className="text-white text-lg mt-4">
-                    {name.toString().toUpperCase()}, {godDescription(name) ? godDescription(name).split(',')[0] : 'Description not available.'}.
+                    {name.toString().toUpperCase()} #{walletPretier(id.toString(), 2)}, {godDescription(name) ? godDescription(name).split(',')[0] : 'Description not available.'}.
                 </p>
                 <Accordion>
                     <AccordionItem title="Contract Info">
@@ -106,11 +139,11 @@ export default function BossBattle({ id, name, governor, status, version, health
                 <img alt="Ares, God of War holding a shield and a sword" className="mx-auto mt-4" height="300" src={godImage(name)} width="300" />
                 <div className="w-full max-w-md mx-auto mt-4">
                     <div className="bg-gray-700 rounded-full h-4 overflow-hidden">
-                        <div className="bg-green-500 h-full" style={{ width: '84%' }}>
+                        <div className="bg-green-500 h-full" style={{ width: `${health / maxHealth}` }}>
                         </div>
                     </div>
                     <p className="text-white text-center mt-2">
-                        20903 / {health}
+                        {health} / {maxHealth}
                     </p>
                 </div>
                 <Accordion>

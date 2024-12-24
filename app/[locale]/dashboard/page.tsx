@@ -44,18 +44,19 @@ export default function Dashboard() {
                     <h1 className="text-orange-500 text-4xl font-bold">
                         THUNDERDOME
                     </h1>
+                    { createdBosses.length > 0 ? <>
                     <div className="flex justify-between">
                         <div 
                             className="cursor-pointer w-16 h-full flex items-center justify-center" 
                             onClick={handlePrev}
                         >
                             &lt;
-                        </div>
-                        {createdBosses.length > 0 && <>
+                        </div>            
                             <BossBattle
                                 id={createdBosses[currentIndex].id}
                                 name={createdBosses[currentIndex].name}
                                 health={createdBosses[currentIndex].health}
+                                maxHealth={createdBosses[currentIndex].maxHealth}
                                 status={createdBosses[currentIndex].status}
                                 version={createdBosses[currentIndex].version}
                                 governor={createdBosses[currentIndex].governor}
@@ -65,11 +66,14 @@ export default function Dashboard() {
                                 onClick={handleNext}
                             >
                                 &gt;
-                            </div>
-                        </>
-                        }
+                            </div>                
                     </div>
+                    </>
+                    : (
+                        <p className="text-yellow-500">There its not bosses jet</p>
+                    )}
                 </>
+
             ) : (
                 <p className="text-red-500">Please connect wallet</p>
             )}
