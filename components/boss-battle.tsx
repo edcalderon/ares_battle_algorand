@@ -21,7 +21,7 @@ import { SearchIcon } from '@/lib/icons';
 import { AresBattleClient } from '@/artifacts/AresBattleClient';
 import { getAlgodConfigFromEnvironment } from '../lib/getAlgoClientConfigs'
 import { AlgorandClient, microAlgos } from '@algorandfoundation/algokit-utils'
-import algosdk from 'algosdk'
+import toast from 'react-hot-toast'
 
 export default function BossBattle({ id, name, governor, status, version, health, maxHealth }: any) {
     const { algodClient, activeAccount, transactionSigner, activeAddress } = useWallet()
@@ -36,6 +36,7 @@ export default function BossBattle({ id, name, governor, status, version, health
     const algorand = AlgorandClient.fromConfig({ algodConfig })
     const sender = { signer: transactionSigner, addr: activeAddress! }
     algorand.setDefaultSigner(transactionSigner)
+    const [isLoading, setIsLoading] = useState(false);
 
     const client = algorand.client.getTypedAppClientById(AresBattleClient, {
         appId: BigInt(id),
@@ -70,35 +71,100 @@ export default function BossBattle({ id, name, governor, status, version, health
         onOpen();
     };
 
+    const abilityImages: { [key: string]: string } = {
+        SLASH: "https://storage.googleapis.com/a1aa/image/kkE4eHVbgvWMS6wc9JIiAaMzR2fnDbf51XCHDSevHyguzsrPB.jpg",
+        HEAL: "https://storage.googleapis.com/a1aa/image/4Fs5T04OOqrPNRUBdnvxDxwZ429OIEowDSkOMVeLjuxcmd9JA.jpg",
+        NUKE: "https://storage.googleapis.com/a1aa/image/DS8FJe2dNw0YESR5Tng65yfPAppeCO3uEbBdH5HMSe3emZXfE.jpg",
+    };
+
     const handleConfirm = async () => {
-        switch (selectedAbility) {
-            case 'SLASH':
-                console.log(`Using ability: SLASH for ${abilityCost} Algo`);
+        setIsLoading(true);
+        try {
+            let result;
+            switch (selectedAbility) {
+                case 'SLASH':
+                    console.log(`Using ability: SLASH for ${abilityCost} Algo`);
 
-                const ptxn = await algorand.createTransaction.payment({
-                    sender: sender.addr.toString(),
-                    receiver: client.appAddress.toString(),
-                    amount: microAlgos(1_000) ,
-                  })
+                    const ptxn = await algorand.createTransaction.payment({
+                        sender: sender.addr.toString(),
+                        receiver: client.appAddress.toString(),
+                        amount: microAlgos(1_000),
+                    });
 
-                const result = await client.send.slash({ args: { user: sender.addr.toString(), damagePayment: ptxn, times: BigInt(1) },  sender: sender.addr.toString() /* ,  boxReferences: ['V'] */})
+                    result = await client.send.slash({ args: { user: sender.addr.toString(), damagePayment: ptxn, times: BigInt(1) }, sender: sender.addr.toString() });
 
-                console.log(result)
+                    console.log(result);
+                    break;
+                case 'HEAL':
+                    console.log(`Using ability: HEAL for ${abilityCost} Algo`);
+                    // Add logic for HEAL ability here
+                    break;
+                case 'NUKE':
+                    console.log(`Using ability: NUKE! for ${abilityCost} Algo`);
+                    // Add logic for NUKE! ability here
+                    break;
+                default:
+                    console.log('Unknown ability');
+            }
 
-                break;
-            case 'HEAL':
-                console.log(`Using ability: HEAL for ${abilityCost} Algo`);
-                // Add logic for HEAL ability here
-                break;
-            case 'NUKE!':
-                console.log(`Using ability: NUKE! for ${abilityCost} Algo`);
-                // Add logic for NUKE! ability here
-                break;
-            default:
-                console.log('Unknown ability');
+            if (result) {
+                toast.custom((t) => (
+                    <div
+                        className={`${t.visible ? 'animate-enter' : 'animate-leave'
+                            } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+                    >
+                        <div className="flex-1 w-0 p-4">
+                            <div className="flex items-start">
+                                <div className="flex-shrink-0 pt-0.5">
+                                    <img
+                                        className="h-10 w-10 rounded-full"
+                                        src={abilityImages[selectedAbility]}
+                                        alt={selectedAbility}
+                                    />
+                                </div>
+                                <div className="ml-3 flex-1">
+                                    <p className="text-sm font-medium text-gray-900">
+                                        You &nbsp;
+                                        <span className={selectedAbility === 'NUKE' || selectedAbility === 'SLASH' ? 'text-red-500' : 'text-green-500'}>
+                                            {selectedAbility}ED &nbsp;
+                                        </span>
+                                        <span className="font-bold">
+                                            {name.toString().toUpperCase()}
+                                        </span>
+                                    </p>
+                                    <p className="mt-1 text-sm text-gray-500">
+                                        <span className={selectedAbility === 'NUKE' || selectedAbility === 'SLASH' ? 'text-red-500' : 'text-green-500'}>
+                                            {abilityCost * 100}
+                                        </span> {selectedAbility === 'NUKE' || selectedAbility === 'SLASH' ? 'Damage' : 'Heal'} {abilityCost > 1 ? 'Points' : 'Point'} made!
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex border-l border-gray-200">
+                            <button
+                                onClick={() => toast.dismiss(t.id)}
+                                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                ), {
+                    position: "top-center"
+                })
+            } else {
+                toast.error(`!`);
+                throw new Error('No result returned');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error(`Error executing ${selectedAbility}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        } finally {
+            setIsLoading(false);
         }
         onClose();
     };
+
 
 
     return (
@@ -187,7 +253,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                         ⚔️ SLASH 🗡️
                     </p>
                     <p className="text-orange-400 text-sm">
-                        🧑‍🤝‍🧑 fozzyy.coop.algo
+                        🧑🤝‍🤝 fozzyy.coop.algo
                     </p>
                     <p className="text-red-500 text-sm">
                         23 DMG
@@ -206,7 +272,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                             <p className="text-red-500 text-sm">
                                 1-1.2x DMG
                             </p>
-                            <img alt="Slash icon" className="mx-auto mt-2" height="50" src="https://storage.googleapis.com/a1aa/image/kkE4eHVbgvWMS6wc9JIiAaMzR2fnDbf51XCHDSevHyguzsrPB.jpg" width="50" />
+                            <img alt="Slash icon" className="mx-auto mt-2" height="50" src={abilityImages['SLASH']} width="50" />
                         </button>
                         <div className="flex items-center justify-center mt-2 space-x-2">
                             <button
@@ -240,7 +306,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                         <p className="text-green-500 text-sm">
                             50-150 HP
                         </p>
-                        <img alt="Heal icon" className="mx-auto mt-2" height="50" src="https://storage.googleapis.com/a1aa/image/4Fs5T04OOqrPNRUBdnvxDxwZ429OIEowDSkOMVeLjuxcmd9JA.jpg" width="50" />
+                        <img alt="Heal icon" className="mx-auto mt-2" height="50" src={abilityImages['HEAL']} width="50" />
                         <p className="text-white mt-2">
                             0.8
                             <img alt="Algorand logo" className="inline-block h-4 w-4" src="/algologo.png" />
@@ -248,14 +314,14 @@ export default function BossBattle({ id, name, governor, status, version, health
                             </i>
                         </p>
                     </button>
-                    <button className="text-center" onClick={() => handleAbilityClick('NUKE!', 1.33)}>
+                    <button className="text-center" onClick={() => handleAbilityClick('NUKE', 1.33)}>
                         <p className="text-yellow-500 font-bold">
                             NUKE!
                         </p>
                         <p className="text-yellow-500 text-sm">
                             100-200 DMG
                         </p>
-                        <img alt="Nuke icon" className="mx-auto mt-2" height="50" src="https://storage.googleapis.com/a1aa/image/DS8FJe2dNw0YESR5Tng65yfPAppeCO3uEbBdH5HMSe3emZXfE.jpg" width="50" />
+                        <img alt="Nuke icon" className="mx-auto mt-2" height="50" src={abilityImages['NUKE']} width="50" />
                         <p className="text-white mt-2">
                             1.33
                             <img alt="Algorand logo" className="inline-block h-4 w-4" src="/algologo.png" />
@@ -277,7 +343,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                                     <Button color="danger" variant="light" onPress={onClose}>
                                         Close
                                     </Button>
-                                    <Button color="primary" onClick={handleConfirm}>
+                                    <Button color="primary" isLoading={isLoading} onClick={handleConfirm}>
                                         Confirm
                                     </Button>
                                 </ModalFooter>
