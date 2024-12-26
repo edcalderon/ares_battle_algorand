@@ -23,7 +23,7 @@ import { getAlgodConfigFromEnvironment } from '../lib/getAlgoClientConfigs'
 import { AlgorandClient, microAlgos } from '@algorandfoundation/algokit-utils'
 import toast from 'react-hot-toast'
 
-export default function BossBattle({ id, name, governor, status, version, health, maxHealth }: any) {
+export default function BossBattle({ id, name, governor, status, version, health, maxHealth, pool }: any) {
     const { algodClient, activeAccount, transactionSigner, activeAddress } = useWallet()
     const [createdApps, setCreatedApps] = useState([])
     const [chosenAbility, setChosenAbility] = useState('')
@@ -37,6 +37,9 @@ export default function BossBattle({ id, name, governor, status, version, health
     const sender = { signer: transactionSigner, addr: activeAddress! }
     algorand.setDefaultSigner(transactionSigner)
     const [isLoading, setIsLoading] = useState(false);
+    const [currentHealth, setCurrentHealth] = useState(health);
+    const [recentActions, setRecentActions] = useState<any[]>([]);
+    const [isLoadingRecentActions, setIsLoadingRecentActions] = useState(false);
 
     const client = algorand.client.getTypedAppClientById(AresBattleClient, {
         appId: BigInt(id),
@@ -77,10 +80,15 @@ export default function BossBattle({ id, name, governor, status, version, health
         NUKE: "https://storage.googleapis.com/a1aa/image/DS8FJe2dNw0YESR5Tng65yfPAppeCO3uEbBdH5HMSe3emZXfE.jpg",
     };
 
+    const setCurrentHealthOnChange = (prevHealth: number, healthChange: number) => {
+        setCurrentHealth(Math.min(maxHealth, Math.max(0, prevHealth + healthChange)));
+    }
+
     const handleConfirm = async () => {
         setIsLoading(true);
         try {
             let result;
+            let healthChange = 0;
             switch (selectedAbility) {
                 case 'SLASH':
                     console.log(`Using ability: SLASH for ${abilityCost} Algo`);
@@ -89,25 +97,30 @@ export default function BossBattle({ id, name, governor, status, version, health
                         sender: sender.addr.toString(),
                         receiver: client.appAddress.toString(),
                         amount: microAlgos(1_000),
+                        note: new TextEncoder().encode("slash"),
                     });
 
                     result = await client.send.slash({ args: { user: sender.addr.toString(), damagePayment: ptxn, times: BigInt(1) }, sender: sender.addr.toString() });
 
                     console.log(result);
+                    healthChange -= 1;
                     break;
                 case 'HEAL':
                     console.log(`Using ability: HEAL for ${abilityCost} Algo`);
                     // Add logic for HEAL ability here
+                    healthChange += 50;
                     break;
                 case 'NUKE':
                     console.log(`Using ability: NUKE! for ${abilityCost} Algo`);
                     // Add logic for NUKE! ability here
+                    healthChange -= 20;
                     break;
                 default:
                     console.log('Unknown ability');
             }
 
             if (result) {
+                setCurrentHealthOnChange(currentHealth, healthChange)
                 toast.custom((t) => (
                     <div
                         className={`${t.visible ? 'animate-enter' : 'animate-leave'
@@ -125,7 +138,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                                 <div className="ml-3 flex-1">
                                     <p className="text-sm font-medium text-gray-900">
                                         You &nbsp;
-                                        <span className={selectedAbility === 'NUKE' || selectedAbility === 'SLASH' ? 'text-red-500' : 'text-green-500'}>
+                                        <span className={selectedAbility === 'NUKE' || selectedAbility === 'SLASH' ? 'text-red-500 font-bold' : 'text-green-500 font-bold'}>
                                             {selectedAbility}ED &nbsp;
                                         </span>
                                         <span className="font-bold">
@@ -165,7 +178,26 @@ export default function BossBattle({ id, name, governor, status, version, health
         onClose();
     };
 
+    const fetchRecentActions = async () => {
+        setIsLoadingRecentActions(true);
+        try {
+            const response = await fetch(`https://testnet-idx.algonode.cloud/v2/transactions?application-id=${id}&limit=200`); //TODO: HANDLE WHEN REACH 200 TXN
+            const data = await response.json();
+            console.log(data)
+            // Sort actions by timestamp in descending order
+            const unsortedActions = data.transactions as any[];
+            const sortedActions = unsortedActions.reverse()
+            setRecentActions(sortedActions);
+        } catch (error) {
+            console.error('Error fetching recent actions:', error);
+        } finally {
+            setIsLoadingRecentActions(false);
+        }
+    };
 
+    useEffect(() => {
+        fetchRecentActions();
+    }, [currentHealth]);
 
     return (
         <>
@@ -205,11 +237,11 @@ export default function BossBattle({ id, name, governor, status, version, health
                 <img alt="Ares, God of War holding a shield and a sword" className="mx-auto mt-4" height="300" src={godImage(name)} width="300" />
                 <div className="w-full max-w-md mx-auto mt-4">
                     <div className="bg-gray-700 rounded-full h-4 overflow-hidden">
-                        <div className="bg-green-500 h-full" style={{ width: `${health / maxHealth}` }}>
+                        <div className="bg-green-500 h-full" style={{ width: `${currentHealth / maxHealth * 100}%` }}>
                         </div>
                     </div>
                     <p className="text-white text-center mt-2">
-                        {health} / {maxHealth}
+                        {currentHealth} / {maxHealth}
                     </p>
                 </div>
                 <Accordion>
@@ -240,24 +272,31 @@ export default function BossBattle({ id, name, governor, status, version, health
                 <p className="text-yellow-400 text-lg mt-2">
                     Prize Pool:
                     <span className="text-white">
-                        51.882
+                        {pool || 0}
                         <i className="fas fa-coins">
                         </i>
                     </span>
                 </p>
                 <div className="bg-black border border-yellow-400 rounded-lg p-2 mt-4 inline-block">
-                    <p className="text-yellow-400 text-sm">
-                        Most Recent Action
-                    </p>
-                    <p className="text-red-500 text-lg font-bold">
-                        ⚔️ SLASH 🗡️
-                    </p>
-                    <p className="text-orange-400 text-sm">
-                        🧑🤝‍🤝 fozzyy.coop.algo
-                    </p>
-                    <p className="text-red-500 text-sm">
-                        23 DMG
-                    </p>
+                    <p className="text-yellow-400 text-sm">Most Recent Actions</p>
+                    {isLoadingRecentActions ? (
+                        <div className="text-center text-white">
+                            Loading recent actions...
+                            <div className="loader"></div>
+                        </div>
+                    ) : (
+                        recentActions && recentActions.length > 0 && (
+                            <div key={0} className="text-red-500 text-lg font-bold">
+                                ⚔️ { } 🗡️
+                                <p className="text-orange-400 text-sm">
+                                    🧑🤝‍🤝 {walletPretier(recentActions[0].sender, 4)}
+                                </p>
+                                <p className="text-red-500 text-sm">
+                                    { } DMG
+                                </p>
+                            </div>
+                        )
+                    )}
                 </div>
 
                 <p className="text-orange-500 text-lg mt-4">

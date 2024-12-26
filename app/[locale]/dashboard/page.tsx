@@ -60,6 +60,7 @@ export default function Dashboard() {
                                 status={createdBosses[currentIndex].status}
                                 version={createdBosses[currentIndex].version}
                                 governor={createdBosses[currentIndex].governor}
+                                pool={createdBosses[currentIndex].pool}
                             />
                             <div 
                                 className="cursor-pointer w-16 h-full flex items-center justify-center" 

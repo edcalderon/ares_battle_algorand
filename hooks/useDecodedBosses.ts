@@ -13,16 +13,19 @@ export const useDecodedBosses = (createdApps: any[]) => {
                     ? String(decodedState.find(state => state.key === 'n')?.value).replace(/[^a-zA-Z0-9]/g, '')
                     : 'Unknown',
                 health: decodedState && decodedState.length > 0
-                    ? decodedState.find(state => state.key === 'hp')?.value
+                    ? decodedState.find(state => state.key === 'h')?.value
                     : 'Unknown',
                 maxHealth: decodedState && decodedState.length > 0
-                    ? decodedState.find(state => state.key === 'thp')?.value
-                    : 'Unknown',    
+                    ? decodedState.find(state => state.key === 'th')?.value
+                    : 'Unknown',
                 governor: decodedState && decodedState.length > 0
                     ? decodedState.find(state => state.key === 'g')?.value
                     : 'Unknown',
                 status: decodedState && decodedState.length > 0
                     ? decodedState.find(state => state.key === 's')?.value
+                    : 'Unknown',
+                pool: decodedState && decodedState.length > 0
+                    ? decodedState.find(state => state.key === 'p')?.value
                     : 'Unknown',
                 version: decodedState && decodedState.length > 0
                     ? decodedState.find(state => state.key === 'v')?.value
