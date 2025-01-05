@@ -9,9 +9,11 @@ import toast from 'react-hot-toast'
 import { allCollection } from 'greek-mythology-data';
 import { useEffect } from 'react';
 import { getExplorerUrl } from '@/lib/getExplorerUrl';
+import algosdk from 'algosdk'
+
 
 export default function CreateBossCard() {
-    const { activeAddress, transactionSigner } = useWalletReact()
+    const { activeAddress, transactionSigner, signTransactions, sendTransactions } = useWalletReact()
     const [loading, setLoading] = React.useState<boolean>(false)
     const [name, setName] = React.useState<string>('')
     const [rate, setRate] = React.useState<string>('')
@@ -33,25 +35,82 @@ export default function CreateBossCard() {
         const bossTotalHP = parseInt(rate)
         try {
 
+            const makePaymentTxn = async (sender: string, receiver: any, amount: number) => {
+                const suggestedParams = await algorand.getSuggestedParams();
+                return algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+                    sender,
+                    receiver, // Sending to self for funding
+                    amount, // Amount to send
+                    suggestedParams // Use fetched params
+                });
+            }
+
             const { result, appClient: client } = await factory.send.create.createApplication({
                 sender: sender.addr,
                 signer: sender.signer,
                 args: [bossTotalHP, name],
                 //deletable: true,
-            })
+            });
 
-            if(result) {
-                await client.appClient.fundAppAccount({ amount: microAlgos(1_000_000), sender: sender.addr.toString() })
+            if (result) {
+                toast.success(`${name} is been create, please fund it!`, {
+                    duration: 5000
+                })
+                /* const suggestedParams = await algorand.getSuggestedParams()
+
+                const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+                    sender: activeAddress,
+                    receiver: client.appAddress,
+                    amount: 1e6 + 3100,
+                    suggestedParams,
+                })
+
+                const encodedTransaction = algosdk.encodeUnsignedTransaction(transaction)
+
+                const signedTransactions = await signTransactions([encodedTransaction])
+
+                const waitRoundsToConfirm = 4 */
+                const result2 = await client.appClient.fundAppAccount({ amount: microAlgos(100000 /* 1e6 + */ /* 3100 */), sender: sender.addr.toString() })
+                if (result2) {
+                    toast.success(`Now Initialize ${name} Box`, {
+                        duration: 5000
+                    })
+                    try {
+
+                        const ptxn = await algorand.createTransaction.payment({
+                            sender: sender.addr.toString(),
+                            receiver: client.appAddress.toString(),
+                            amount: microAlgos(1_000),
+                            note: new TextEncoder().encode("create"),
+                        });
+
+                        const prefix = new Uint8Array(Buffer.from("c"))
+                        const addressBytes = algosdk.decodeAddress(activeAddress || '').publicKey
+                        const boxName = new Uint8Array(prefix.length + addressBytes.length)
+
+                        /* const { txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm) */
+                        //const resultado = await client.send.initStorage({ args: { mbrPayment: ptxn }, sender: sender.addr.toString() , boxReferences: [{name: prefix, appId: client.appId}], });
+                        //console.log("***box result***")
+                        //console.log(resultado)
+                        result && toast((t) => (
+                            <span>
+                                {name} created with appId: &nbsp;
+                                <a href={getExplorerUrl(result.appId.toString(), 'application')} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
+                                    {result.appId.toString()}
+                                </a>
+                            </span>
+                        ));
+
+                    } catch (e) {
+                        toast.error(`${e}`, {
+                            id: 'txn',
+                            duration: 5000
+                        })
+                    }
+                }
             }
 
-            result && toast((t) => (
-                <span>
-                    {name} created with appId: &nbsp;
-                    <a href={getExplorerUrl(parseInt(result.appId.toString()))} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
-                        {result.appId.toString()}
-                    </a>
-                </span>
-            ));
+
 
         } catch (e) {
             toast.error(`${e}`, {

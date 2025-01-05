@@ -22,8 +22,9 @@ import { AresBattleClient } from '@/artifacts/AresBattleClient';
 import { getAlgodConfigFromEnvironment } from '../lib/getAlgoClientConfigs'
 import { AlgorandClient, microAlgos } from '@algorandfoundation/algokit-utils'
 import toast from 'react-hot-toast'
+import { Contributor } from '@/types';
 
-export default function BossBattle({ id, name, governor, status, version, health, maxHealth, pool }: any) {
+export default function BossBattle({ id, name, governor, status, version, health, maxHealth, pool, contributors }: any) {
     const { algodClient, activeAccount, transactionSigner, activeAddress } = useWallet()
     const [createdApps, setCreatedApps] = useState([])
     const [chosenAbility, setChosenAbility] = useState('')
@@ -40,6 +41,9 @@ export default function BossBattle({ id, name, governor, status, version, health
     const [currentHealth, setCurrentHealth] = useState(health);
     const [recentActions, setRecentActions] = useState<any[]>([]);
     const [isLoadingRecentActions, setIsLoadingRecentActions] = useState(false);
+    const [currentContributors, setCurrentContributors] = useState<any[]>(contributors);
+    const [resentAction, setResentAction] = useState<[contributor: Contributor, action: string]>();
+    const [currentPool, setCurrentPool] = useState<number>(pool);
 
     const client = algorand.client.getTypedAppClientById(AresBattleClient, {
         appId: BigInt(id),
@@ -91,18 +95,15 @@ export default function BossBattle({ id, name, governor, status, version, health
             let healthChange = 0;
             switch (selectedAbility) {
                 case 'SLASH':
-                    console.log(`Using ability: SLASH for ${abilityCost} Algo`);
+                    //console.log(`Using ability: SLASH for ${abilityCost} Algo`);
 
                     const ptxn = await algorand.createTransaction.payment({
                         sender: sender.addr.toString(),
                         receiver: client.appAddress.toString(),
-                        amount: microAlgos(1_000),
+                        amount: microAlgos(1_000 * slashAbilityPoints),
                         note: new TextEncoder().encode("slash"),
                     });
-
-                    result = await client.send.slash({ args: { user: sender.addr.toString(), damagePayment: ptxn, times: BigInt(1) }, sender: sender.addr.toString() });
-
-                    console.log(result);
+                    result = await client.send.slash({ args: { user: sender.addr.toString(), damagePayment: ptxn, times: BigInt(slashAbilityPoints) }, sender: sender.addr.toString() });
                     healthChange -= 1;
                     break;
                 case 'HEAL':
@@ -121,6 +122,18 @@ export default function BossBattle({ id, name, governor, status, version, health
 
             if (result) {
                 setCurrentHealthOnChange(currentHealth, healthChange)
+                const updatedContributors = currentContributors.map(contributor => {
+                    if (contributor.address === activeAddress) {
+                        setResentAction([contributor, "SLASH"])
+                        return {
+                            ...contributor,
+                            contribution: parseInt(contributor.contribution) + (slashAbilityPoints * 1000)
+                        };
+                    }
+                    return contributor;
+                });
+                setCurrentContributors(updatedContributors);
+                setCurrentPool(currentPool + slashAbilityPoints * 1000)
                 toast.custom((t) => (
                     <div
                         className={`${t.visible ? 'animate-enter' : 'animate-leave'
@@ -181,12 +194,11 @@ export default function BossBattle({ id, name, governor, status, version, health
     const fetchRecentActions = async () => {
         setIsLoadingRecentActions(true);
         try {
-            const response = await fetch(`https://testnet-idx.algonode.cloud/v2/transactions?application-id=${id}&limit=200`); //TODO: HANDLE WHEN REACH 200 TXN
-            const data = await response.json();
-            console.log(data)
+
             // Sort actions by timestamp in descending order
-            const unsortedActions = data.transactions as any[];
+            const unsortedActions = contributors
             const sortedActions = unsortedActions.reverse()
+            console.log(sortedActions)
             setRecentActions(sortedActions);
         } catch (error) {
             console.error('Error fetching recent actions:', error);
@@ -198,6 +210,10 @@ export default function BossBattle({ id, name, governor, status, version, health
     useEffect(() => {
         fetchRecentActions();
     }, [currentHealth]);
+
+    useEffect(() => {
+        setCurrentContributors(contributors);
+    }, [contributors]);
 
     return (
         <>
@@ -212,7 +228,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                                 <p className="text-left"><span className="font-bold text-yellow-400">Name:</span> {name}</p>
                                 <p className="text-left"><span className="font-bold text-yellow-400">AppId:</span>
                                     &nbsp;
-                                    <a href={getExplorerUrl(parseInt(id.toString()))} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
+                                    <a href={getExplorerUrl(id.toString(), 'application')} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
                                         {id} <SearchIcon className="inline-block h-4 w-4 mr-1" aria-hidden="true" />
                                     </a>
                                 </p>
@@ -272,7 +288,8 @@ export default function BossBattle({ id, name, governor, status, version, health
                 <p className="text-yellow-400 text-lg mt-2">
                     Prize Pool:
                     <span className="text-white">
-                        {pool || 0}
+                        {currentPool / 100000 || 0}
+                        <img alt="Algorand logo" className="inline-block h-4 w-4" src="/algologo.png" />
                         <i className="fas fa-coins">
                         </i>
                     </span>
@@ -285,17 +302,17 @@ export default function BossBattle({ id, name, governor, status, version, health
                             <div className="loader"></div>
                         </div>
                     ) : (
-                        recentActions && recentActions.length > 0 && (
+                        recentActions.length > 0 ? (
                             <div key={0} className="text-red-500 text-lg font-bold">
-                                ⚔️ { } 🗡️
+                                ⚔️ {resentAction && resentAction[0].contribution || 0} 🗡️
                                 <p className="text-orange-400 text-sm">
-                                    🧑🤝‍🤝 {walletPretier(recentActions[0].sender, 4)}
+                                    🧑🤝‍🤝 {resentAction && walletPretier(resentAction[0].address, 4) || 'No One' }
                                 </p>
                                 <p className="text-red-500 text-sm">
-                                    { } DMG
+                                    {resentAction && resentAction[1] || '' } 
                                 </p>
-                            </div>
-                        )
+                            </div> 
+                        ): <></>
                     )}
                 </div>
 
@@ -390,6 +407,27 @@ export default function BossBattle({ id, name, governor, status, version, health
                         )}
                     </ModalContent>
                 </Modal>
+                &nbsp;
+                <div className="text-center">
+                    <h1 className="text-4xl mb-2">Leaderboard</h1>
+                    <p className="text-lg mb-4">Players: {contributors.length || 0}</p>
+                    <div className="leaderboard w-full max-w-md mx-auto">
+                        <div className="leaderboard-header">
+                            <i className="fas fa-user"></i>
+                            <i className="fas fa-trophy"></i>
+                        </div>
+                        {currentContributors && currentContributors.map((contributor: Contributor) => (
+                            <div className="leaderboard-item" key={contributor.address}>
+                                <span>
+                                    <a href={getExplorerUrl(contributor.address, 'account')} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
+                                        {walletPretier(contributor.address, 4)}
+                                    </a>
+                                </span>
+                                <span>{contributor.contribution}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
 
             </div>

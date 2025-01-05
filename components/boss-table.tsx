@@ -246,7 +246,7 @@ export default function BossTable({ bosses }: { bosses: Boss[] }) {
                     );
                   default:
                     return <TableCell>
-                      <a href={getExplorerUrl(item.id)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
+                      <a href={getExplorerUrl(item.id.toString(), 'application')} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
                         {item.id.toString()}
                       </a>
                     </TableCell>;
@@ -256,6 +256,7 @@ export default function BossTable({ bosses }: { bosses: Boss[] }) {
           )}
         </TableBody>
       </Table>
+
       <CreateBossModal isOpen={isOpen} onClose={onClose} />
     </>
   );

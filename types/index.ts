@@ -12,3 +12,7 @@ export type Boss = {
   status: string
   version: string;
 };
+
+export type Contributor = { address: string; contribution: number };
+
+export type ExplorerActionType = 'account' | 'application';

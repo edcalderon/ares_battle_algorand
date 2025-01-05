@@ -1,9 +1,10 @@
 import algosdk from 'algosdk';
 
-export const decodeGlobalState = (globalState: Array<{ key: string; value: any }>) => {
+export const decodeGlobalState = (globalState: Array<{ key: any; value: any }>) => {
     const decodedStates = Array.from(globalState).map((item) => {
-        const decodedKey = Buffer.from(item.key, "base64").toString();
-        let decodedValue;
+        
+        let decodedKey : any = Buffer.from(item.key, "base64").toString();
+        let decodedValue: any;
 
         decodedValue = typeof item.value === 'string'
             ? Buffer.from(item.value, "base64").toString()
@@ -11,6 +12,10 @@ export const decodeGlobalState = (globalState: Array<{ key: string; value: any }
 
         if (decodedKey === "g" && typeof item.value === 'object' && item.value.bytes) {
             decodedValue = algosdk.encodeAddress(new Uint8Array(Buffer.from(item.value.bytes, "base64")));
+        }
+
+        if (decodedKey.length > "9") {
+            decodedKey = algosdk.encodeAddress(new Uint8Array(item.key));
         }
 
         if (item.value.uint) {

@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.leaderboard {
+    border: 2px solid #ff9900;
+    border-radius: 10px;
+    padding: 20px;
+}
+.leaderboard-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #ff9900;
+}
+.leaderboard-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #ff9900;
+}
+.leaderboard-item:last-child {
+    border-bottom: none;
+}

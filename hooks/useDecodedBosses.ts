@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { decodeGlobalState } from '@/lib/decodeGlobalState';
+import { Contributor } from '@/types';
 
 export const useDecodedBosses = (createdApps: any[]) => {
     const [createdBosses, setCreatedBosses] = useState<any[]>([]);
@@ -7,6 +8,7 @@ export const useDecodedBosses = (createdApps: any[]) => {
     useEffect(() => {
         const decodedAppsFormatedToBoss = createdApps.map(app => {
             const decodedState = decodeGlobalState(app.params.globalState as any).decodedStates;
+            console.log(decodedState)
             return {
                 id: parseInt(app.id),
                 name: decodedState && decodedState.length > 0
@@ -30,6 +32,9 @@ export const useDecodedBosses = (createdApps: any[]) => {
                 version: decodedState && decodedState.length > 0
                     ? decodedState.find(state => state.key === 'v')?.value
                     : 'Unknown',
+                contributors: decodedState ? decodedState
+                    .filter(state => !['n', 'h', 'th', 'g', 's', 'p', 'v'].includes(state.key))
+                    .map(state => ({ address: state.key, contribution: state.value })) as Contributor[] : []
             }
         });
         setCreatedBosses(decodedAppsFormatedToBoss);
