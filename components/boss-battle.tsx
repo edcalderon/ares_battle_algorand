@@ -13,6 +13,15 @@ import {
     Chip,
     Accordion,
     AccordionItem,
+    Table,
+    TableHeader,
+    TableColumn,
+    TableBody,
+    TableRow,
+    TableCell,
+    getKeyValue,
+    Spinner,
+    Tooltip,
 } from '@nextui-org/react';
 import { walletPretier } from '@/lib/getWalletPrettier';
 import { allCollection } from 'greek-mythology-data';
@@ -23,11 +32,12 @@ import { getAlgodConfigFromEnvironment } from '../lib/getAlgoClientConfigs'
 import { AlgorandClient, microAlgos } from '@algorandfoundation/algokit-utils'
 import toast from 'react-hot-toast'
 import { Contributor } from '@/types';
+import { useAsyncList } from "@react-stately/data";
+import { SortDescriptor } from "@react-types/shared";
 
 export default function BossBattle({ id, name, governor, status, version, health, maxHealth, pool, contributors }: any) {
     const { algodClient, activeAccount, transactionSigner, activeAddress } = useWallet()
     const [createdApps, setCreatedApps] = useState([])
-    const [chosenAbility, setChosenAbility] = useState('')
     const [slashAbilityPoints, setSlashAbilityPoints] = useState(1);
     const [selectedAbility, setSelectedAbility] = useState('');
     const [abilityCost, setAbilityCost] = useState(0);
@@ -38,6 +48,7 @@ export default function BossBattle({ id, name, governor, status, version, health
     const sender = { signer: transactionSigner, addr: activeAddress! }
     algorand.setDefaultSigner(transactionSigner)
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
     const [currentHealth, setCurrentHealth] = useState(health);
     const [recentActions, setRecentActions] = useState<any[]>([]);
     const [isLoadingRecentActions, setIsLoadingRecentActions] = useState(false);
@@ -84,10 +95,6 @@ export default function BossBattle({ id, name, governor, status, version, health
         NUKE: "https://storage.googleapis.com/a1aa/image/DS8FJe2dNw0YESR5Tng65yfPAppeCO3uEbBdH5HMSe3emZXfE.jpg",
     };
 
-    const setCurrentHealthOnChange = (prevHealth: number, healthChange: number) => {
-        setCurrentHealth(Math.min(maxHealth, Math.max(0, prevHealth + healthChange)));
-    }
-
     const handleConfirm = async () => {
         setIsLoading(true);
         try {
@@ -95,33 +102,44 @@ export default function BossBattle({ id, name, governor, status, version, health
             let healthChange = 0;
             switch (selectedAbility) {
                 case 'SLASH':
-                    //console.log(`Using ability: SLASH for ${abilityCost} Algo`);
-
-                    const ptxn = await algorand.createTransaction.payment({
+                    const dtxn = await algorand.createTransaction.payment({
                         sender: sender.addr.toString(),
                         receiver: client.appAddress.toString(),
                         amount: microAlgos(1_000 * slashAbilityPoints),
                         note: new TextEncoder().encode("slash"),
                     });
-                    result = await client.send.slash({ args: { user: sender.addr.toString(), damagePayment: ptxn, times: BigInt(slashAbilityPoints) }, sender: sender.addr.toString() });
-                    healthChange -= 1;
+                    result = await client.send.slash({ args: { damagePayment: dtxn, times: BigInt(slashAbilityPoints) }, sender: sender.addr.toString() });
+
+                    healthChange -= slashAbilityPoints;
                     break;
                 case 'HEAL':
-                    console.log(`Using ability: HEAL for ${abilityCost} Algo`);
-                    // Add logic for HEAL ability here
-                    healthChange += 50;
+                    const htxn = await algorand.createTransaction.payment({
+                        sender: sender.addr.toString(),
+                        receiver: client.appAddress.toString(),
+                        amount: microAlgos(8_000_00),
+                        note: new TextEncoder().encode("heal"),
+                    });
+                    result = await client.send.heal({ args: { healPayment: htxn }, sender: sender.addr.toString() });
+                    healthChange += 80;
                     break;
                 case 'NUKE':
-                    console.log(`Using ability: NUKE! for ${abilityCost} Algo`);
-                    // Add logic for NUKE! ability here
-                    healthChange -= 20;
+                    const ntxn = await algorand.createTransaction.payment({
+                        sender: sender.addr.toString(),
+                        receiver: client.appAddress.toString(),
+                        amount: microAlgos(1_330_000),
+                        note: new TextEncoder().encode("heal"),
+                    });
+                    result = await client.send.nuke({ args: { nukePayment: ntxn }, sender: sender.addr.toString() });
+                    healthChange -= 133;
                     break;
                 default:
                     console.log('Unknown ability');
             }
 
             if (result) {
-                setCurrentHealthOnChange(currentHealth, healthChange)
+                const bonusPoints = currentHealth - parseInt(result.return?.toString() || '0')
+                setCurrentHealth(result.return?.toString() || currentHealth.toString());
+
                 const updatedContributors = currentContributors.map(contributor => {
                     if (contributor.address === activeAddress) {
                         setResentAction([contributor, "SLASH"])
@@ -133,7 +151,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                     return contributor;
                 });
                 setCurrentContributors(updatedContributors);
-                setCurrentPool(currentPool + slashAbilityPoints * 1000)
+                setCurrentPool(currentPool + Math.abs(healthChange) * 10000)
                 toast.custom((t) => (
                     <div
                         className={`${t.visible ? 'animate-enter' : 'animate-leave'
@@ -152,7 +170,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                                     <p className="text-sm font-medium text-gray-900">
                                         You &nbsp;
                                         <span className={selectedAbility === 'NUKE' || selectedAbility === 'SLASH' ? 'text-red-500 font-bold' : 'text-green-500 font-bold'}>
-                                            {selectedAbility}ED &nbsp;
+                                            {selectedAbility}D &nbsp;
                                         </span>
                                         <span className="font-bold">
                                             {name.toString().toUpperCase()}
@@ -160,8 +178,8 @@ export default function BossBattle({ id, name, governor, status, version, health
                                     </p>
                                     <p className="mt-1 text-sm text-gray-500">
                                         <span className={selectedAbility === 'NUKE' || selectedAbility === 'SLASH' ? 'text-red-500' : 'text-green-500'}>
-                                            {abilityCost * 100}
-                                        </span> {selectedAbility === 'NUKE' || selectedAbility === 'SLASH' ? 'Damage' : 'Heal'} {abilityCost > 1 ? 'Points' : 'Point'} made!
+                                            {abilityCost * 100} + {selectedAbility === 'NUKE' && bonusPoints}
+                                        </span> {selectedAbility === 'NUKE' || selectedAbility === 'SLASH' ? `Damage ${selectedAbility === 'NUKE' && 'with Random Bonus '}` : 'Heal'} {abilityCost > 1 ? 'Points' : 'Point'} made!
                                     </p>
                                 </div>
                             </div>
@@ -183,7 +201,6 @@ export default function BossBattle({ id, name, governor, status, version, health
                 throw new Error('No result returned');
             }
         } catch (error) {
-            console.error(error);
             toast.error(`Error executing ${selectedAbility}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         } finally {
             setIsLoading(false);
@@ -194,11 +211,8 @@ export default function BossBattle({ id, name, governor, status, version, health
     const fetchRecentActions = async () => {
         setIsLoadingRecentActions(true);
         try {
-
-            // Sort actions by timestamp in descending order
-            const unsortedActions = contributors
-            const sortedActions = unsortedActions.reverse()
-            console.log(sortedActions)
+            const unsortedActions = contributors;
+            const sortedActions = unsortedActions.reverse();
             setRecentActions(sortedActions);
         } catch (error) {
             console.error('Error fetching recent actions:', error);
@@ -215,6 +229,34 @@ export default function BossBattle({ id, name, governor, status, version, health
         setCurrentContributors(contributors);
     }, [contributors]);
 
+    const list = useAsyncList<Contributor>({
+        async load({ signal }) {
+            setIsLoadingLeaderboard(true);
+            try {
+                return {
+                    items: currentContributors as Contributor[],
+                };
+            } finally {
+                setIsLoadingLeaderboard(false);
+            }
+        },
+        async sort({ items, sortDescriptor }) {
+            return {
+                items: items.sort((a, b) => {
+                    let first = a[sortDescriptor.column as keyof Contributor];
+                    let second = b[sortDescriptor.column as keyof Contributor];
+                    let cmp = (parseInt(first as string) || first) < (parseInt(second as string) || second) ? -1 : 1;
+
+                    if (sortDescriptor.direction === "descending") {
+                        cmp *= -1;
+                    }
+
+                    return cmp;
+                }),
+            };
+        },
+    });
+
     return (
         <>
             <div className="text-center">
@@ -226,25 +268,25 @@ export default function BossBattle({ id, name, governor, status, version, health
                         <div className="grid grid-cols-2 gap-2 text-sm text-white">
                             <div>
                                 <p className="text-left"><span className="font-bold text-yellow-400">Name:</span> {name}</p>
-                                <p className="text-left"><span className="font-bold text-yellow-400">AppId:</span>
+                                <p className="text-left"><span className="font-bold text-yellow-400">App Id:</span>
                                     &nbsp;
-                                    <a href={getExplorerUrl(id.toString(), 'application')} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
-                                        {id} <SearchIcon className="inline-block h-4 w-4 mr-1" aria-hidden="true" />
+                                    <a href={getExplorerUrl(id?.toString() || '', 'application')} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
+                                        {id?.toString()}
                                     </a>
+                                    &nbsp;
+                                    <SearchIcon className="inline-block h-4 w-4 mr-1" aria-hidden="true" />
                                 </p>
-                            </div>
-                            <div>
-                                <p className="text-left"><span className="font-bold text-yellow-400">Max Health:</span> {health}</p>
-                                <p className="text-left"><span className="font-bold text-yellow-400">Governor:</span> {walletPretier(governor, 4)}</p>
-                            </div>
-                            <div>
                                 <p className="text-left"><span className="font-bold text-yellow-400">Boss Status:</span>
                                     &nbsp;
-                                    <Chip color={status === 'ACTIVE' ? 'success' : status === 'PAUSED' ? 'danger' : 'warning'} className="mt-1">
+                                    <Chip color={status === 'ALIVE' ? 'success' : status === 'PAUSED' ? 'danger' : 'warning'} className="mt-1">
                                         {status}
                                     </Chip>
                                 </p>
-
+                            </div>
+                            <div>
+                                <p className="text-left"><span className="font-bold text-yellow-400">Max Health:</span> {maxHealth}</p>
+                                <p className="text-left"><span className="font-bold text-yellow-400">Deployer:</span> {walletPretier(governor, 4)}</p>
+                                <p className="text-left"><span className="font-bold text-yellow-400">Governor:</span> {walletPretier(governor, 4)}</p>
                                 <p className="text-left"><span className="font-bold text-yellow-400">Contract Version:</span> {version}</p>
                             </div>
                         </div>
@@ -286,12 +328,16 @@ export default function BossBattle({ id, name, governor, status, version, health
                 </Accordion>
 
                 <p className="text-yellow-400 text-lg mt-2">
-                    Prize Pool:
+                    Prize Pool ≈ {' '}
                     <span className="text-white">
-                        {currentPool / 100000 || 0}
+                        {' '}
+                        <a href={getExplorerUrl(client.appAddress.toString(), 'account')} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>
+                            {currentPool / 1000000 || 0}
+                        </a>
                         <img alt="Algorand logo" className="inline-block h-4 w-4" src="/algologo.png" />
-                        <i className="fas fa-coins">
-                        </i>
+                        <Tooltip content="* (Aprox. Value) Prize Pool = Contract Balance - Creation Balance.">
+                            <span className="text-yellow-400">*</span>
+                        </Tooltip>
                     </span>
                 </p>
                 <div className="bg-black border border-yellow-400 rounded-lg p-2 mt-4 inline-block">
@@ -306,13 +352,13 @@ export default function BossBattle({ id, name, governor, status, version, health
                             <div key={0} className="text-red-500 text-lg font-bold">
                                 ⚔️ {resentAction && resentAction[0].contribution || 0} 🗡️
                                 <p className="text-orange-400 text-sm">
-                                    🧑🤝‍🤝 {resentAction && walletPretier(resentAction[0].address, 4) || 'No One' }
+                                    🧑🤝‍🤝 {resentAction && walletPretier(resentAction[0].address, 4) || 'No One'}
                                 </p>
                                 <p className="text-red-500 text-sm">
-                                    {resentAction && resentAction[1] || '' } 
+                                    {resentAction && resentAction[1] || ''}
                                 </p>
-                            </div> 
-                        ): <></>
+                            </div>
+                        ) : <></>
                     )}
                 </div>
 
@@ -411,22 +457,51 @@ export default function BossBattle({ id, name, governor, status, version, health
                 <div className="text-center">
                     <h1 className="text-4xl mb-2">Leaderboard</h1>
                     <p className="text-lg mb-4">Players: {contributors.length || 0}</p>
-                    <div className="leaderboard w-full max-w-md mx-auto">
-                        <div className="leaderboard-header">
-                            <i className="fas fa-user"></i>
-                            <i className="fas fa-trophy"></i>
-                        </div>
-                        {currentContributors && currentContributors.map((contributor: Contributor) => (
-                            <div className="leaderboard-item" key={contributor.address}>
-                                <span>
-                                    <a href={getExplorerUrl(contributor.address, 'account')} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
-                                        {walletPretier(contributor.address, 4)}
-                                    </a>
-                                </span>
-                                <span>{contributor.contribution}</span>
-                            </div>
-                        ))}
-                    </div>
+                    <Table
+                        aria-label="Leaderboard"
+                        classNames={{
+                            table: "min-h-[100px]",
+                        }}
+                        sortDescriptor={list.sortDescriptor as SortDescriptor}
+                        onSortChange={list.sort as (descriptor: SortDescriptor) => void}
+                    >
+                        <TableHeader>
+                            <TableColumn key="address" allowsSorting>
+                                Player
+                            </TableColumn>
+                            <TableColumn key="contribution" allowsSorting>
+                                Points
+                            </TableColumn>
+                        </TableHeader>
+                        <TableBody
+                            isLoading={isLoadingLeaderboard}
+                            items={list.items}
+                            loadingContent={<Spinner label="Loading..." />}
+                        >
+                            {(item: Contributor) => (
+                                <TableRow key={item.address}>
+                                    {(columnKey) => (
+                                        <TableCell>
+                                            {columnKey === "address" ? (
+                                                <>
+                                                    <a href={getExplorerUrl(item.address, 'account')} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
+                                                        {walletPretier(item.address, 4)}
+                                                    </a>
+                                                    {item.address === governor && (
+                                                        <Tooltip content="* (Actual Boss Governor) Deployer starts with 110 point.">
+                                                            <span className="text-yellow-400">*</span>
+                                                        </Tooltip>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                item.contribution / 10000
+                                            )}
+                                        </TableCell>
+                                    )}
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
                 </div>
 
 

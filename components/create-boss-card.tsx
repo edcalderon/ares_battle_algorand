@@ -160,7 +160,7 @@ export default function CreateBossCard() {
                                 {(god) => <SelectItem key={god.name}>{god.name}</SelectItem>}
                             </Select>
                             <Select
-                                items={[{ value: '25000' }, { value: '50000' }, { value: '100000' }]}
+                                items={[{ value: '2500' }, { value: '5000' }, { value: '10000' }]}
                                 key='outside'
                                 label="Healt"
                                 placeholder="Select initial healt"

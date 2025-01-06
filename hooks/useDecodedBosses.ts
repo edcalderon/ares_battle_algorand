@@ -8,7 +8,6 @@ export const useDecodedBosses = (createdApps: any[]) => {
     useEffect(() => {
         const decodedAppsFormatedToBoss = createdApps.map(app => {
             const decodedState = decodeGlobalState(app.params.globalState as any).decodedStates;
-            console.log(decodedState)
             return {
                 id: parseInt(app.id),
                 name: decodedState && decodedState.length > 0
