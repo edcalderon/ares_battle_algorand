@@ -5,9 +5,11 @@ import { ALGO_ADMIN, CONTRACT_VERSION } from '@/config/env';;
 import BossBattle from '@/components/boss-battle';
 import { getAppsFromAddressByKey } from '@/lib/getAppsFromAddress';
 import { useDecodedBosses } from '@/hooks/useDecodedBosses';
+import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
+import { Spinner } from "@nextui-org/react";
 
 export default function Dashboard() {
-    const { algodClient, activeAccount } = useWallet();
+    const { activeAccount } = useWallet();
     const [createdApps, setCreatedApps] = React.useState<any[]>([])
     const [loadingCreatedApps, setLoadingCreatedApps] = React.useState<boolean>(false);
     const [currentIndex, setCurrentIndex] = React.useState(0);
@@ -22,8 +24,7 @@ export default function Dashboard() {
             return accountInfo
         }
         getAccountInfo()
-        console.log(createdApps)
-
+        console.log(currentIndex)
     }, [activeAccount])
 
     const createdBosses = useDecodedBosses(createdApps);
@@ -42,16 +43,21 @@ export default function Dashboard() {
             {activeAccount ? (
                 <>
                     <h1 className="text-orange-500 text-4xl font-bold">
-                        THUNDERDOME
+                        THUNDERDOME 
                     </h1>
-                    { createdBosses.length > 0 ? <>
-                    <div className="flex justify-between">
-                        <div 
-                            className="cursor-pointer w-16 h-full flex items-center justify-center" 
-                            onClick={handlePrev}
-                        >
-                            &lt;
-                        </div>            
+                    {loadingCreatedApps ? (
+                        <>  
+                            <Spinner color="warning" label="Loading Bosses..." />
+                        </>
+
+                    ) : createdBosses.length > 0 ? <>
+                        <div className="flex justify-between">
+                            <div
+                                className="cursor-pointer w-16 h-full flex items-center justify-center"
+                                onClick={handlePrev}
+                            >
+                                <FaArrowLeft />
+                            </div>
                             <BossBattle
                                 id={createdBosses[currentIndex].id}
                                 name={createdBosses[currentIndex].name}
@@ -63,17 +69,17 @@ export default function Dashboard() {
                                 pool={createdBosses[currentIndex].pool}
                                 contributors={createdBosses[currentIndex].contributors}
                             />
-                            <div 
-                                className="cursor-pointer w-16 h-full flex items-center justify-center" 
+                            <div
+                                className="cursor-pointer w-16 h-full flex items-center justify-center"
                                 onClick={handleNext}
                             >
-                                &gt;
-                            </div>                
-                    </div>
+                                <FaArrowRight />
+                            </div>
+                        </div>
                     </>
-                    : (
-                        <p className="text-yellow-500">There its not bosses jet</p>
-                    )}
+                        : (
+                            <p className="text-yellow-500">There its not bosses jet</p>
+                        )}
                 </>
 
             ) : (

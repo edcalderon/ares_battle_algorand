@@ -65,6 +65,12 @@ export default function BossBattle({ id, name, governor, status, version, health
         setGods(filteredData)
     }, [allCollection]);
 
+    useEffect(() => {
+        setCurrentHealth(health)
+        setCurrentPool(pool)
+        setCurrentContributors(contributors)
+    }, [health, pool, contributors]);
+
     const godImage = (name: string) => gods.find(god => god.name === name)?.images?.regular;
     const godDescription = (name: string) => gods.find(god => god.name === name)?.description;
     const godGender = (name: string) => gods.find(god => god.name === name)?.gender;
@@ -79,7 +85,6 @@ export default function BossBattle({ id, name, governor, status, version, health
             setCreatedApps(accountInfo['created-apps'])
             return accountInfo
         }
-        console.log(createdApps)
         getAccountInfo()
     }, [activeAccount])
 
