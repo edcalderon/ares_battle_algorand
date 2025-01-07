@@ -58,11 +58,6 @@ export default function BossBattle({ id, name, governor, status, version, health
     const [page, setPage] = React.useState(1);
     const appInfo = useAppInfo(currentId)
 
-    useEffect(() => {
-        setCurrentContributors(appInfo.decodedBossInfo?.contributors || [])
-        //reloadList()
-    }, [appInfo]);
-
     const client = algorand.client.getTypedAppClientById(AresBattleClient, {
         appId: BigInt(id),
     })
@@ -76,6 +71,8 @@ export default function BossBattle({ id, name, governor, status, version, health
         setCurrentId(id)
         setCurrentHealth(health)
         setCurrentPool(pool)
+        setCurrentContributors(appInfo.decodedBossInfo?.contributors || [])
+        reloadList()
     }, [id]);
 
     const godImage = (name: string) => gods.find(god => god.name === name)?.images?.regular;
@@ -164,7 +161,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                 setCurrentContributors(updatedContributors);
                 reloadList()
                 setCurrentPool(currentPool + Math.abs(healthChange) * 10000);
-                toast.custom((t) => (
+                toast.custom((t:any) => (
                     <div
                         className={`${t.visible ? 'animate-enter' : 'animate-leave'
                             } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
@@ -239,7 +236,7 @@ export default function BossBattle({ id, name, governor, status, version, health
 
 
     const list = useAsyncList<Contributor>({
-        async load({ signal, cursor }) {
+        async load({  }) {
             try {
                 setIsLoadingTable(false);
                 return {
@@ -255,7 +252,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                 };
             }
         },
-        async sort({ items, sortDescriptor }) {
+        async sort({ items, sortDescriptor }: { items: Contributor[], sortDescriptor: SortDescriptor }) {
             return {
                 items: items.sort((a, b) => {
                     let first = a[sortDescriptor.column as keyof Contributor];
@@ -270,7 +267,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                 }),
             };
         },
-        getKey: contributor => contributor.address
+        getKey: (contributor: Contributor) => contributor.address
     });
 
     const reloadList = async() => {
@@ -525,7 +522,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                         >
                             {(item: Contributor) => (
                                 <TableRow key={item.address}>
-                                    {(columnKey) => (
+                                    {(columnKey: any) => (
                                         <TableCell>
                                             {columnKey === "address" ? (
                                                 <>
