@@ -1,41 +1,31 @@
 'use client'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useWallet } from '@txnlab/use-wallet-react'
-import { ALGO_ADMIN, CONTRACT_VERSION } from '@/config/env';;
 import BossBattle from '@/components/boss-battle';
-import { getAppsFromAddressByKey } from '@/lib/getAppsFromAddress';
 import { useDecodedBosses } from '@/hooks/useDecodedBosses';
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import { Spinner } from "@nextui-org/react";
+import useAdminAccountInfo from '@/hooks/useAdminAccountInfo';
+import { ALGO_ADMIN } from '@/config/env';;
 
 export default function Dashboard() {
     const { activeAccount } = useWallet();
-    const [createdApps, setCreatedApps] = React.useState<any[]>([])
-    const [loadingCreatedApps, setLoadingCreatedApps] = React.useState<boolean>(false);
+    const { createdApps, loadingCreatedApps } = useAdminAccountInfo();
     const [currentIndex, setCurrentIndex] = React.useState(0);
-
-    useEffect(() => {
-        const getAccountInfo = async () => {
-            setLoadingCreatedApps(true);
-            if (!activeAccount) throw new Error('No selected account.')
-            const accountInfo = await getAppsFromAddressByKey(ALGO_ADMIN, { key: 'v', value: CONTRACT_VERSION })
-            setCreatedApps(accountInfo)
-            setLoadingCreatedApps(false);
-            return accountInfo
-        }
-        getAccountInfo()
-        console.log(currentIndex)
-    }, [activeAccount])
-
     const createdBosses = useDecodedBosses(createdApps);
-    console.log(createdBosses)
 
     const handleNext = () => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % createdBosses.length);
+        setCurrentIndex((prevIndex) => {
+            const nextIndex = (prevIndex + 1) % createdBosses.length;
+            return nextIndex < 0 ? 0 : nextIndex;
+        });
     };
 
     const handlePrev = () => {
-        setCurrentIndex((prevIndex) => (prevIndex - 1 + createdBosses.length) % createdBosses.length);
+        setCurrentIndex((prevIndex) => {
+            const prevIndexCalc = (prevIndex - 1 + createdBosses.length) % createdBosses.length;
+            return prevIndexCalc < 0 ? createdBosses.length - 1 : prevIndexCalc;
+        });
     };
 
     return (

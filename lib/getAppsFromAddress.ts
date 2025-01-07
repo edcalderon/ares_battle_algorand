@@ -1,6 +1,6 @@
 import { getAlgodConfigFromEnvironment } from './getAlgoClientConfigs'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
-import {decodeGlobalState} from './decodeGlobalState'
+import { decodeGlobalState } from './decodeGlobalState'
 const algodConfig = getAlgodConfigFromEnvironment()
 const algorand = AlgorandClient.fromConfig({ algodConfig })
 
@@ -25,12 +25,13 @@ export const getAppsFromAddressByKey = async (Address: string, keyValue: { key: 
             return globalState ? decodeGlobalState(globalState as any).decodedStates.some(state => state.key === keyValue.key && state.value.toString().split('v')[1] === keyValue.value.split('v')[1]) : false;
         });
 
-        console.log(filtered)
-        
-        
         allFilteredApps.push(...filtered);
     }
-
     return allFilteredApps;
 }
 
+
+export const getAppInfo = async (appId: bigint) => {
+    const appInfo = await algorand.client.algod.getApplicationByID(appId).do();
+    return appInfo;
+}

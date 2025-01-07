@@ -7,10 +7,13 @@ export type IconSvgProps = SVGProps<SVGSVGElement> & {
 export type Boss = {
   id: number;
   name: string;
-  health: number;
-  governor: string;
-  status: string
-  version: string;
+  health: any;
+  maxHealth: any;
+  governor: any;
+  status: any;
+  pool: any;
+  version: any;
+  contributors: Contributor[];
 };
 
 export type Contributor = { address: string; contribution: number };

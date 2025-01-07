@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { useWallet } from '@txnlab/use-wallet-react'
-import { ALGO_ADMIN } from '@/config/env';
 import {
     Modal,
     Button,
@@ -19,9 +18,9 @@ import {
     TableBody,
     TableRow,
     TableCell,
-    getKeyValue,
     Spinner,
     Tooltip,
+    Pagination,
 } from '@nextui-org/react';
 import { walletPretier } from '@/lib/getWalletPrettier';
 import { allCollection } from 'greek-mythology-data';
@@ -34,10 +33,10 @@ import toast from 'react-hot-toast'
 import { Contributor } from '@/types';
 import { useAsyncList } from "@react-stately/data";
 import { SortDescriptor } from "@react-types/shared";
+import useAppInfo from '@/hooks/useAppInfoToBossFormat';
 
 export default function BossBattle({ id, name, governor, status, version, health, maxHealth, pool, contributors }: any) {
-    const { algodClient, activeAccount, transactionSigner, activeAddress } = useWallet()
-    const [createdApps, setCreatedApps] = useState([])
+    const { transactionSigner, activeAddress } = useWallet()
     const [slashAbilityPoints, setSlashAbilityPoints] = useState(1);
     const [selectedAbility, setSelectedAbility] = useState('');
     const [abilityCost, setAbilityCost] = useState(0);
@@ -48,13 +47,21 @@ export default function BossBattle({ id, name, governor, status, version, health
     const sender = { signer: transactionSigner, addr: activeAddress! }
     algorand.setDefaultSigner(transactionSigner)
     const [isLoading, setIsLoading] = useState(false);
-    const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
+    const [currentId, setCurrentId] = useState(id);
     const [currentHealth, setCurrentHealth] = useState(health);
     const [recentActions, setRecentActions] = useState<any[]>([]);
     const [isLoadingRecentActions, setIsLoadingRecentActions] = useState(false);
-    const [currentContributors, setCurrentContributors] = useState<any[]>(contributors);
+    const [currentContributors, setCurrentContributors] = useState<Contributor[]>(contributors);
     const [resentAction, setResentAction] = useState<[contributor: Contributor, action: string]>();
     const [currentPool, setCurrentPool] = useState<number>(pool);
+    const [isLoadingTable, setIsLoadingTable] = React.useState(true);
+    const [page, setPage] = React.useState(1);
+    const appInfo = useAppInfo(currentId)
+
+    useEffect(() => {
+        setCurrentContributors(appInfo.decodedBossInfo?.contributors || [])
+        //reloadList()
+    }, [appInfo]);
 
     const client = algorand.client.getTypedAppClientById(AresBattleClient, {
         appId: BigInt(id),
@@ -66,10 +73,10 @@ export default function BossBattle({ id, name, governor, status, version, health
     }, [allCollection]);
 
     useEffect(() => {
+        setCurrentId(id)
         setCurrentHealth(health)
         setCurrentPool(pool)
-        setCurrentContributors(contributors)
-    }, [health, pool, contributors]);
+    }, [id]);
 
     const godImage = (name: string) => gods.find(god => god.name === name)?.images?.regular;
     const godDescription = (name: string) => gods.find(god => god.name === name)?.description;
@@ -78,15 +85,6 @@ export default function BossBattle({ id, name, governor, status, version, health
     const godCategory = (name: string) => gods.find(god => god.name === name)?.category;
     const godRomanName = (name: string) => gods.find(god => god.name === name)?.romanName;
 
-    useEffect(() => {
-        const getAccountInfo = async () => {
-            if (!activeAccount) throw new Error('No selected account.')
-            const accountInfo = await algodClient.accountInformation(ALGO_ADMIN).do()
-            setCreatedApps(accountInfo['created-apps'])
-            return accountInfo
-        }
-        getAccountInfo()
-    }, [activeAccount])
 
     const handleAbilityClick = (ability: string, cost: number) => {
         setSelectedAbility(ability);
@@ -105,6 +103,8 @@ export default function BossBattle({ id, name, governor, status, version, health
         try {
             let result;
             let healthChange = 0;
+            let contributionChange = 0;
+
             switch (selectedAbility) {
                 case 'SLASH':
                     const dtxn = await algorand.createTransaction.payment({
@@ -114,8 +114,8 @@ export default function BossBattle({ id, name, governor, status, version, health
                         note: new TextEncoder().encode("slash"),
                     });
                     result = await client.send.slash({ args: { damagePayment: dtxn, times: BigInt(slashAbilityPoints) }, sender: sender.addr.toString() });
-
                     healthChange -= slashAbilityPoints;
+                    contributionChange = slashAbilityPoints;
                     break;
                 case 'HEAL':
                     const htxn = await algorand.createTransaction.payment({
@@ -142,21 +142,28 @@ export default function BossBattle({ id, name, governor, status, version, health
             }
 
             if (result) {
-                const bonusPoints = currentHealth - parseInt(result.return?.toString() || '0')
+                const bonusPoints = currentHealth - parseInt(result.return?.toString() || '0');
                 setCurrentHealth(result.return?.toString() || currentHealth.toString());
 
                 const updatedContributors = currentContributors.map(contributor => {
                     if (contributor.address === activeAddress) {
-                        setResentAction([contributor, "SLASH"])
+                        setResentAction([contributor, selectedAbility]);
+                        const newContribution = contributor.contribution + contributionChange;
+                        console.log(list.getItem(contributor.address))
+                        list.update(contributor.address, {
+                            address: contributor.address,
+                            contribution: newContribution + 1
+                        });
                         return {
                             ...contributor,
-                            contribution: parseInt(contributor.contribution) + (slashAbilityPoints * 1000)
+                            contribution: newContribution + 1
                         };
                     }
                     return contributor;
                 });
                 setCurrentContributors(updatedContributors);
-                setCurrentPool(currentPool + Math.abs(healthChange) * 10000)
+                reloadList()
+                setCurrentPool(currentPool + Math.abs(healthChange) * 10000);
                 toast.custom((t) => (
                     <div
                         className={`${t.visible ? 'animate-enter' : 'animate-leave'
@@ -230,19 +237,22 @@ export default function BossBattle({ id, name, governor, status, version, health
         fetchRecentActions();
     }, [currentHealth]);
 
-    useEffect(() => {
-        setCurrentContributors(contributors);
-    }, [contributors]);
 
     const list = useAsyncList<Contributor>({
-        async load({ signal }) {
-            setIsLoadingLeaderboard(true);
+        async load({ signal, cursor }) {
             try {
+                setIsLoadingTable(false);
                 return {
-                    items: currentContributors as Contributor[],
+                    items: currentContributors,
+                    cursor: undefined
                 };
-            } finally {
-                setIsLoadingLeaderboard(false);
+            } catch (e) {
+                console.log(e);
+                setIsLoadingTable(false);
+                return {
+                    items: [],
+                    cursor: undefined
+                };
             }
         },
         async sort({ items, sortDescriptor }) {
@@ -260,7 +270,20 @@ export default function BossBattle({ id, name, governor, status, version, health
                 }),
             };
         },
+        getKey: contributor => contributor.address
     });
+
+    const reloadList = async() => {
+        list.reload();  
+    };
+
+
+    const rowsPerPage = 1
+    const pages = React.useMemo(() => {
+        return list?.items.length ? Math.ceil(list.items.length / rowsPerPage)  - 1 : 0;
+    }, [list?.items.length, rowsPerPage]);
+
+    const loadingState = isLoadingTable || list?.items.length === 0 ? "loading" : "idle";
 
     return (
         <>
@@ -463,12 +486,28 @@ export default function BossBattle({ id, name, governor, status, version, health
                     <h1 className="text-4xl mb-2">Leaderboard</h1>
                     <p className="text-lg mb-4">Players: {contributors.length || 0}</p>
                     <Table
+                        isHeaderSticky
                         aria-label="Leaderboard"
                         classNames={{
                             table: "min-h-[100px]",
                         }}
                         sortDescriptor={list.sortDescriptor as SortDescriptor}
                         onSortChange={list.sort as (descriptor: SortDescriptor) => void}
+                        bottomContent={<>
+                            <div className="flex w-full justify-center">
+                                <Pagination
+                                    isCompact
+                                    showControls
+                                    showShadow
+                                    color="secondary"
+                                    page={page}
+                                    total={pages}
+                                    onChange={(page) => setPage(page)}
+                                />
+                            </div>
+                        </>
+                        }
+
                     >
                         <TableHeader>
                             <TableColumn key="address" allowsSorting>
@@ -479,9 +518,10 @@ export default function BossBattle({ id, name, governor, status, version, health
                             </TableColumn>
                         </TableHeader>
                         <TableBody
-                            isLoading={isLoadingLeaderboard}
+                            isLoading={isLoadingTable}
                             items={list.items}
                             loadingContent={<Spinner label="Loading..." />}
+                            loadingState={loadingState}
                         >
                             {(item: Contributor) => (
                                 <TableRow key={item.address}>
@@ -489,7 +529,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                                         <TableCell>
                                             {columnKey === "address" ? (
                                                 <>
-                                                    <a href={getExplorerUrl(item.address, 'account')} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
+                                                    <a href={getExplorerUrl(item.address, 'account')} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: '#aa8b0d' }}>
                                                         {walletPretier(item.address, 4)}
                                                     </a>
                                                     {item.address === governor && (
@@ -508,8 +548,6 @@ export default function BossBattle({ id, name, governor, status, version, health
                         </TableBody>
                     </Table>
                 </div>
-
-
             </div>
         </>
     );
