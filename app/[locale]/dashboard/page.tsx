@@ -6,7 +6,6 @@ import { useDecodedBosses } from '@/hooks/useDecodedBosses';
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import { Spinner } from "@nextui-org/react";
 import useAdminAccountInfo from '@/hooks/useAdminAccountInfo';
-import { ALGO_ADMIN } from '@/config/env';;
 
 export default function Dashboard() {
     const { activeAccount } = useWallet();

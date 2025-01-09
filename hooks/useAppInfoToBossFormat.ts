@@ -3,7 +3,7 @@ import { getAppInfo } from '@/lib/getAppsFromAddress';
 import { decodeGlobalState } from '@/lib/decodeGlobalState';
 import type { Boss, Contributor } from '@/types';
 
-const useAppInfo = (appId: bigint) => {
+const useAppInfoToBossFormat = (appId: bigint) => {
     const [decodedBossInfo, setDecodedBossInfo] = useState<Boss>();
     const [loadingCreatedApps, setLoadingCreatedApps] = useState<boolean>(true);
 
@@ -61,4 +61,4 @@ const useAppInfo = (appId: bigint) => {
     return { decodedBossInfo, loadingCreatedApps };
 };
 
-export default useAppInfo;
+export default useAppInfoToBossFormat;

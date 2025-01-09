@@ -1,30 +1,14 @@
 import React from 'react'
 import { useWallet as useWalletReact } from '@txnlab/use-wallet-react'
-import { useEffect } from 'react';
-import { ALGO_ADMIN, CONTRACT_VERSION } from '@/config/env';
-import BossTable from './boss-table';
-import { getAppsFromAddressByKey } from '@/lib/getAppsFromAddress';
-import CreateBossCard from './create-boss-card';
+import useAdminAccountInfo from '@/hooks/useAdminAccountInfo'
 import { useDecodedBosses } from '@/hooks/useDecodedBosses';
+import BossTable from './boss-table';
+import CreateBossCard from './create-boss-card';
 
 export const CreateBossTable = () => {
     const { activeAccount } = useWalletReact()
-    const [createdApps, setCreatedApps] = React.useState<any[]>([])
-    const [loadingCreatedApps, setLoadingCreatedApps] = React.useState<boolean>(false);
-
-    useEffect(() => {
-        const getAccountInfo = async () => {
-            setLoadingCreatedApps(true);
-            if (!activeAccount) throw new Error('No selected account.')
-            const accountInfo = await getAppsFromAddressByKey(ALGO_ADMIN, { key: 'v', value: CONTRACT_VERSION })
-            setCreatedApps(accountInfo)
-            setLoadingCreatedApps(false);
-            return accountInfo
-        }
-        getAccountInfo()
-    }, [activeAccount])
-
-    const createdBosses = useDecodedBosses(createdApps);
+    const { createdApps, loadingCreatedApps } = useAdminAccountInfo()
+    const createdBosses = useDecodedBosses(createdApps)
 
     return (
         <>

@@ -11,9 +11,8 @@ import { useEffect } from 'react';
 import { getExplorerUrl } from '@/lib/getExplorerUrl';
 import algosdk from 'algosdk'
 
-
 export default function CreateBossCard() {
-    const { activeAddress, transactionSigner, signTransactions, sendTransactions } = useWalletReact()
+    const { activeAddress, transactionSigner } = useWalletReact()
     const [loading, setLoading] = React.useState<boolean>(false)
     const [name, setName] = React.useState<string>('')
     const [rate, setRate] = React.useState<string>('')
@@ -56,20 +55,7 @@ export default function CreateBossCard() {
                 toast.success(`${name} is been create, please fund it!`, {
                     duration: 5000
                 })
-                /* const suggestedParams = await algorand.getSuggestedParams()
 
-                const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-                    sender: activeAddress,
-                    receiver: client.appAddress,
-                    amount: 1e6 + 3100,
-                    suggestedParams,
-                })
-
-                const encodedTransaction = algosdk.encodeUnsignedTransaction(transaction)
-
-                const signedTransactions = await signTransactions([encodedTransaction])
-
-                const waitRoundsToConfirm = 4 */
                 const result2 = await client.appClient.fundAppAccount({ amount: microAlgos(100000 /* 1e6 + */ /* 3100 */), sender: sender.addr.toString() })
                 if (result2) {
                     toast.success(`Now Initialize ${name} Box`, {
@@ -101,19 +87,16 @@ export default function CreateBossCard() {
                             </span>
                         ));
 
-                    } catch (e) {
-                        toast.error(`${e}`, {
+                    } catch (e: any) {
+                        toast.error(`ERROR: ${e.toString()}`, {
                             id: 'txn',
                             duration: 5000
                         })
                     }
                 }
             }
-
-
-
-        } catch (e) {
-            toast.error(`${e}`, {
+        } catch (e: any) {
+            toast.error(`ERROR: ${e.toString()}`, {
                 id: 'txn',
                 duration: 5000
             })

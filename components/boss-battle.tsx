@@ -33,7 +33,7 @@ import toast from 'react-hot-toast'
 import { Contributor } from '@/types';
 import { useAsyncList } from "@react-stately/data";
 import { SortDescriptor } from "@react-types/shared";
-import useAppInfo from '@/hooks/useAppInfoToBossFormat';
+import { getAppGlobalStateContributorsToBossFormat } from 'lib/getAppsFromAddress'
 
 export default function BossBattle({ id, name, governor, status, version, health, maxHealth, pool, contributors }: any) {
     const { transactionSigner, activeAddress } = useWallet()
@@ -47,7 +47,6 @@ export default function BossBattle({ id, name, governor, status, version, health
     const sender = { signer: transactionSigner, addr: activeAddress! }
     algorand.setDefaultSigner(transactionSigner)
     const [isLoading, setIsLoading] = useState(false);
-    const [currentId, setCurrentId] = useState(id);
     const [currentHealth, setCurrentHealth] = useState(health);
     const [recentActions, setRecentActions] = useState<any[]>([]);
     const [isLoadingRecentActions, setIsLoadingRecentActions] = useState(false);
@@ -56,7 +55,6 @@ export default function BossBattle({ id, name, governor, status, version, health
     const [currentPool, setCurrentPool] = useState<number>(pool);
     const [isLoadingTable, setIsLoadingTable] = React.useState(true);
     const [page, setPage] = React.useState(1);
-    const appInfo = useAppInfo(currentId)
 
     const client = algorand.client.getTypedAppClientById(AresBattleClient, {
         appId: BigInt(id),
@@ -68,12 +66,12 @@ export default function BossBattle({ id, name, governor, status, version, health
     }, [allCollection]);
 
     useEffect(() => {
-        setCurrentId(id)
         setCurrentHealth(health)
         setCurrentPool(pool)
-        setCurrentContributors(appInfo.decodedBossInfo?.contributors || [])
-        reloadList()
-    }, [id]);
+        setCurrentContributors(contributors)
+        list.reload()
+    }, [id, health, pool, contributors]);
+
 
     const godImage = (name: string) => gods.find(god => god.name === name)?.images?.regular;
     const godDescription = (name: string) => gods.find(god => god.name === name)?.description;
@@ -81,7 +79,6 @@ export default function BossBattle({ id, name, governor, status, version, health
     const godGreekName = (name: string) => gods.find(god => god.name === name)?.greekName;
     const godCategory = (name: string) => gods.find(god => god.name === name)?.category;
     const godRomanName = (name: string) => gods.find(god => god.name === name)?.romanName;
-
 
     const handleAbilityClick = (ability: string, cost: number) => {
         setSelectedAbility(ability);
@@ -146,22 +143,19 @@ export default function BossBattle({ id, name, governor, status, version, health
                     if (contributor.address === activeAddress) {
                         setResentAction([contributor, selectedAbility]);
                         const newContribution = contributor.contribution + contributionChange;
-                        console.log(list.getItem(contributor.address))
-                        list.update(contributor.address, {
-                            address: contributor.address,
-                            contribution: newContribution + 1
-                        });
                         return {
                             ...contributor,
-                            contribution: newContribution + 1
+                            contribution: newContribution
                         };
                     }
                     return contributor;
                 });
                 setCurrentContributors(updatedContributors);
-                reloadList()
                 setCurrentPool(currentPool + Math.abs(healthChange) * 10000);
-                toast.custom((t:any) => (
+                list.reload();
+
+                setPage(prev => prev + 0);
+                toast.custom((t: any) => (
                     <div
                         className={`${t.visible ? 'animate-enter' : 'animate-leave'
                             } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
@@ -236,11 +230,12 @@ export default function BossBattle({ id, name, governor, status, version, health
 
 
     const list = useAsyncList<Contributor>({
-        async load({  }) {
+        async load({ }) {
             try {
                 setIsLoadingTable(false);
+                const contributors = await getAppGlobalStateContributorsToBossFormat(id);
                 return {
-                    items: currentContributors,
+                    items: contributors,
                     cursor: undefined
                 };
             } catch (e) {
@@ -270,14 +265,9 @@ export default function BossBattle({ id, name, governor, status, version, health
         getKey: (contributor: Contributor) => contributor.address
     });
 
-    const reloadList = async() => {
-        list.reload();  
-    };
-
-
     const rowsPerPage = 1
     const pages = React.useMemo(() => {
-        return list?.items.length ? Math.ceil(list.items.length / rowsPerPage)  - 1 : 0;
+        return list?.items.length ? Math.ceil(list.items.length / rowsPerPage) - 1 : 0;
     }, [list?.items.length, rowsPerPage]);
 
     const loadingState = isLoadingTable || list?.items.length === 0 ? "loading" : "idle";
@@ -499,7 +489,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                                     color="secondary"
                                     page={page}
                                     total={pages}
-                                    onChange={(page) => setPage(page)}
+                                    onChange={(page: any) => setPage(page)}
                                 />
                             </div>
                         </>
@@ -530,7 +520,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                                                         {walletPretier(item.address, 4)}
                                                     </a>
                                                     {item.address === governor && (
-                                                        <Tooltip content="* (Actual Boss Governor) Deployer starts with 110 point.">
+                                                        <Tooltip content="* (Actual Boss Governor) Deployer starts with 11 point.">
                                                             <span className="text-yellow-400">*</span>
                                                         </Tooltip>
                                                     )}
