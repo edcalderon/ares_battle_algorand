@@ -8,7 +8,7 @@ import { AlgorandClient, microAlgos } from '@algorandfoundation/algokit-utils'
 import toast from 'react-hot-toast'
 import { allCollection } from 'greek-mythology-data';
 import { useEffect } from 'react';
-import { getExplorerUrl } from '@/lib/getExplorerUrl';
+import { getExplorerUrl } from '@/lib/getAlgorandUrl';
 import algosdk from 'algosdk'
 
 export default function CreateBossCard() {

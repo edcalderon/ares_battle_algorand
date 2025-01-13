@@ -22,13 +22,12 @@ import {
 } from "@nextui-org/react";
 import type { Boss } from 'types'
 import CreateBossModal from './create-boss-modal';
-import { getExplorerUrl } from "@/lib/getExplorerUrl";
+import { getExplorerUrl } from '@/lib/getAlgorandUrl';
 import { allCollection } from 'greek-mythology-data';
 import { VerticalDotsIcon, SearchIcon, PlusIcon } from "@/lib/icons";
 import { AresBattleClient } from '@/artifacts/AresBattleClient';
 import { getAlgodConfigFromEnvironment } from '../lib/getAlgoClientConfigs'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
-import toast from 'react-hot-toast'
 import { useWallet as useWalletReact } from '@txnlab/use-wallet-react'
 
 export const columns = [
