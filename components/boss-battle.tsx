@@ -24,7 +24,8 @@ import {
 } from '@nextui-org/react';
 import { walletPretier } from '@/lib/getWalletPrettier';
 import { allCollection } from 'greek-mythology-data';
-import { getExplorerUrl } from '@/lib/getExplorerUrl';
+import { getExplorerUrl } from '@/lib/getAlgorandUrl';
+import { getAlgorandApiUrl } from '@/lib/getAlgorandUrl';
 import { SearchIcon } from '@/lib/icons';
 import { AresBattleClient } from '@/artifacts/AresBattleClient';
 import { getAlgodConfigFromEnvironment } from '../lib/getAlgoClientConfigs'
@@ -66,12 +67,14 @@ export default function BossBattle({ id, name, governor, status, version, health
     }, [allCollection]);
 
     useEffect(() => {
-        setCurrentHealth(health)
-        setCurrentPool(pool)
-        setCurrentContributors(contributors)
-        list.reload()
+        const updateState = async () => {
+            setCurrentHealth(health)
+            setCurrentPool(await getPoolBalanceFromAppAdress())
+            setCurrentContributors(contributors)
+            list.reload()
+        }
+        updateState()
     }, [id, health, pool, contributors]);
-
 
     const godImage = (name: string) => gods.find(god => god.name === name)?.images?.regular;
     const godDescription = (name: string) => gods.find(god => god.name === name)?.description;
@@ -91,6 +94,13 @@ export default function BossBattle({ id, name, governor, status, version, health
         HEAL: "https://storage.googleapis.com/a1aa/image/4Fs5T04OOqrPNRUBdnvxDxwZ429OIEowDSkOMVeLjuxcmd9JA.jpg",
         NUKE: "https://storage.googleapis.com/a1aa/image/DS8FJe2dNw0YESR5Tng65yfPAppeCO3uEbBdH5HMSe3emZXfE.jpg",
     };
+
+    const getPoolBalanceFromAppAdress = async () => {
+        const apiUrl = getAlgorandApiUrl(client.appAddress.toString(), 'accounts');
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        return data.amount - 110000;
+    }
 
     const handleConfirm = async () => {
         setIsLoading(true);
@@ -471,7 +481,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                 &nbsp;
                 <div className="text-center">
                     <h1 className="text-4xl mb-2">Leaderboard</h1>
-                    <p className="text-lg mb-4">Players: {contributors.length || 0}</p>
+                    <p className="text-lg mb-4">Players: {list.items.length || 0}</p>
                     <Table
                         isHeaderSticky
                         aria-label="Leaderboard"
