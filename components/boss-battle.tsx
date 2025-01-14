@@ -264,9 +264,9 @@ export default function BossBattle({ id, name, governor, status, version, health
         getKey: (contributor: Contributor) => contributor.address
     });
 
-    const rowsPerPage = 1
+    const rowsPerPage = 5;
     const pages = React.useMemo(() => {
-        return list?.items.length ? Math.ceil(list.items.length / rowsPerPage) - 1 : 0;
+        return list?.items.length ? Math.ceil(list.items.length / rowsPerPage): 0;
     }, [list?.items.length, rowsPerPage]);
 
     const loadingState = isLoadingTable || list?.items.length === 0 ? "loading" : "idle";
