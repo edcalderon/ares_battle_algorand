@@ -34,7 +34,7 @@ import toast from 'react-hot-toast'
 import { Contributor } from '@/types';
 import { useAsyncList } from "@react-stately/data";
 import { SortDescriptor } from "@react-types/shared";
-import { getAppGlobalStateContributorsToBossFormat } from 'lib/getAppsFromAddress'
+import { getAppBoxToBossFormat } from '@/lib/getAppsFromAddress';
 
 export default function BossBattle({ id, name, governor, status, version, health, maxHealth, pool, contributors }: any) {
     const { transactionSigner, activeAddress } = useWallet()
@@ -51,7 +51,7 @@ export default function BossBattle({ id, name, governor, status, version, health
     const [currentHealth, setCurrentHealth] = useState(health);
     const [recentActions, setRecentActions] = useState<any[]>([]);
     const [isLoadingRecentActions, setIsLoadingRecentActions] = useState(false);
-    const [currentContributors, setCurrentContributors] = useState<Contributor[]>(contributors);
+    const [currentContributors, setCurrentContributors] = useState<number>(contributors);
     const [resentAction, setResentAction] = useState<[contributor: Contributor, action: string]>();
     const [currentPool, setCurrentPool] = useState<number>(pool);
     const [isLoadingTable, setIsLoadingTable] = React.useState(true);
@@ -116,8 +116,10 @@ export default function BossBattle({ id, name, governor, status, version, health
                         receiver: client.appAddress.toString(),
                         amount: microAlgos(1_000 * slashAbilityPoints),
                         note: new TextEncoder().encode("slash"),
+                        //extraFee: microAlgos(7_000)
                     });
-                    result = await client.send.slash({ args: { damagePayment: dtxn, times: BigInt(slashAbilityPoints) }, sender: sender.addr.toString() });
+                    const prefix = new Uint8Array(Buffer.from("stakers"))
+                    result = await client.send.slash({ args: { damagePayment: dtxn, times: BigInt(slashAbilityPoints) }, sender: sender.addr.toString(), boxReferences: [{ name: prefix, appId: client.appId }], extraFee: microAlgos(8_000) });
                     healthChange -= slashAbilityPoints;
                     contributionChange = slashAbilityPoints;
                     break;
@@ -148,23 +150,9 @@ export default function BossBattle({ id, name, governor, status, version, health
             if (result) {
                 const bonusPoints = currentHealth - parseInt(result.return?.toString() || '0');
                 setCurrentHealth(result.return?.toString() || currentHealth.toString());
-
-                const updatedContributors = currentContributors.map(contributor => {
-                    if (contributor.address === activeAddress) {
-                        setResentAction([contributor, selectedAbility]);
-                        const newContribution = contributor.contribution + contributionChange;
-                        return {
-                            ...contributor,
-                            contribution: newContribution
-                        };
-                    }
-                    return contributor;
-                });
-                setCurrentContributors(updatedContributors);
+                setCurrentContributors(currentContributors + 1);
                 setCurrentPool(currentPool + Math.abs(healthChange) * 10000);
                 list.reload();
-
-                setPage(prev => prev + 0);
                 toast.custom((t: any) => (
                     <div
                         className={`${t.visible ? 'animate-enter' : 'animate-leave'
@@ -243,9 +231,10 @@ export default function BossBattle({ id, name, governor, status, version, health
         async load({ }) {
             try {
                 setIsLoadingTable(false);
-                const contributors = await getAppGlobalStateContributorsToBossFormat(id);
+                const prefix = new Uint8Array(Buffer.from("stakers"));
+                const items = await getAppBoxToBossFormat(client.appId, prefix);
                 return {
-                    items: contributors,
+                    items: items,
                     cursor: undefined
                 };
             } catch (e) {
@@ -481,7 +470,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                 &nbsp;
                 <div className="text-center">
                     <h1 className="text-4xl mb-2">Leaderboard</h1>
-                    <p className="text-lg mb-4">Players: {list.items.length || 0}</p>
+                    <p className="text-lg mb-4">Players: {list.items.length || 0} </p>
                     <Table
                         isHeaderSticky
                         aria-label="Leaderboard"
@@ -517,7 +506,7 @@ export default function BossBattle({ id, name, governor, status, version, health
                         <TableBody
                             isLoading={isLoadingTable}
                             items={list.items}
-                            loadingContent={<Spinner label="Loading..." />}
+                            loadingContent={<Spinner label="Waiting..." />}
                             loadingState={loadingState}
                         >
                             {(item: Contributor) => (
@@ -530,13 +519,13 @@ export default function BossBattle({ id, name, governor, status, version, health
                                                         {walletPretier(item.address, 4)}
                                                     </a>
                                                     {item.address === governor && (
-                                                        <Tooltip content="* (Actual Boss Governor) Deployer starts with 11 point.">
+                                                        <Tooltip content="* (Actual Boss Governor)">
                                                             <span className="text-yellow-400">*</span>
                                                         </Tooltip>
                                                     )}
                                                 </>
                                             ) : (
-                                                item.contribution / 10000
+                                                item.contribution / 1000
                                             )}
                                         </TableCell>
                                     )}

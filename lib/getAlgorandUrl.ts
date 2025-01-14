@@ -14,3 +14,10 @@ export const getAlgorandApiUrl = (id: string, action: ExplorerActionType) => {
     ? `https://testnet-api.algonode.cloud/v2/${action}/` + id
     : `https://mainnet-api.algonode.cloud/v2/${action}/` + id;
 }
+
+export const getAlgorandApiUrlWithBox = (id: string, boxName: string, action: ExplorerActionType) => {
+    return  algodConfig.network === 'TestNet'
+    ? `https://testnet-api.algonode.cloud/v2/${action}/` + id + `/box?name=${boxName}`
+    : `https://mainnet-api.algonode.cloud/v2/${action}/` + id + `/box?name=${boxName}`;
+}
+

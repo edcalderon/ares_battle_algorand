@@ -1,7 +1,8 @@
 import { getAlgodConfigFromEnvironment } from './getAlgoClientConfigs'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { decodeGlobalState } from './decodeGlobalState'
-import { Contributor, Boss } from '@/types'
+import { Contributor } from '@/types'
+import algosdk from 'algosdk'
 const algodConfig = getAlgodConfigFromEnvironment()
 const algorand = AlgorandClient.fromConfig({ algodConfig })
 
@@ -38,18 +39,56 @@ export const getAppInfo = async (appId: bigint) => {
 export const getAppGlobalStateContributorsToBossFormat = async (appId: bigint): Promise<any> => {
     try {
         const appInfo = await algorand.client.algod.getApplicationByID(appId).do();
-        console.log("API Response:", appInfo); // Log the response
+
         if (!appInfo) return null; // Return null if appInfo is not found
 
         const decodedState = decodeGlobalState(appInfo.params.globalState as any).decodedStates;
 
-        const contributors = decodedState ? decodedState
-        .filter(state => !['n', 'h', 'th', 'g', 's', 'p', 'v'].includes(state.key))
-        .map(state => ({ address: state.key, contribution: state.value })) as Contributor[] : [];
+        const contributors = decodedState && decodedState.length > 0
+            ? decodedState.find(state => state.key === 'numStakers')?.value
+            : 'Unknown'
         return contributors
 
     } catch (error) {
         console.error("Error fetching app global state:", error);
-        return null; // Return null or handle the error as needed
+        return null;
     }
 };
+
+
+export const getAppBoxToBossFormat = async (appId: bigint, name: Uint8Array): Promise<any> => {
+    try {
+        const boxesResponse = await algorand.client.algod.getApplicationBoxByName(appId, name).do();
+
+        const numStakers = await getAppGlobalStateContributorsToBossFormat(appId)
+    
+        // Define the empty box matrix
+        const emptyBoxMatrix = new Uint8Array([...Array(1280)].map(() => 0x41)); // 1280 bytes of 'A'
+
+        const CompareEmptyBoxMatrix = Buffer.from(emptyBoxMatrix).toString('utf-8')
+        const CompareResponseBoxMatrix =  Buffer.from(boxesResponse.value).toString('base64')
+
+        // Compare response to the empty box matrix
+        if (boxesResponse.value && CompareEmptyBoxMatrix != CompareResponseBoxMatrix) {
+
+            const formattedDataArray = [];
+            for (let i = 0; i < numStakers; i++) {
+                const offset = i * 48; // Assuming each item takes 48 bytes (32 for address, 8 for balance, 8 for entryRound)
+                const address = algosdk.encodeAddress(boxesResponse.value.slice(offset, offset + 32));
+                const contribution = algosdk.decodeUint64(boxesResponse.value.slice(offset + 32, offset + 40), 'bigint');
+                const entryRound = algosdk.decodeUint64(boxesResponse.value.slice(offset + 40, offset + 48), 'bigint');
+
+                formattedDataArray.push({ address, contribution: parseInt(contribution.toString()), entryRound });
+            }
+            return formattedDataArray; 
+        }
+
+        return null; // Return null if the box is empty
+
+    } catch (error) {
+        console.error("Error fetching app:", error);
+        return null; 
+    }
+};
+
+

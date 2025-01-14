@@ -56,7 +56,7 @@ export default function CreateBossCard() {
                     duration: 5000
                 })
 
-                const result2 = await client.appClient.fundAppAccount({ amount: microAlgos(100000 /* 1e6 + */ /* 3100 */), sender: sender.addr.toString() })
+                const result2 = await client.appClient.fundAppAccount({ amount: microAlgos(/* 100000 */ 489300 /* 1e6 + */ /* 3100 */), sender: sender.addr.toString() })
                 if (result2) {
                     toast.success(`Now Initialize ${name} Box`, {
                         duration: 5000
@@ -70,12 +70,12 @@ export default function CreateBossCard() {
                             note: new TextEncoder().encode("create"),
                         });
 
-                        const prefix = new Uint8Array(Buffer.from("c"))
+                        const prefix = new Uint8Array(Buffer.from("stakers"))
                         const addressBytes = algosdk.decodeAddress(activeAddress || '').publicKey
                         const boxName = new Uint8Array(prefix.length + addressBytes.length)
 
                         /* const { txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm) */
-                        //const resultado = await client.send.initStorage({ args: { mbrPayment: ptxn }, sender: sender.addr.toString() , boxReferences: [{name: prefix, appId: client.appId}], });
+                        const resultado = await client.send.initStorage({ args: {}, sender: sender.addr.toString() , boxReferences: [{name: prefix, appId: client.appId}] });
                         //console.log("***box result***")
                         //console.log(resultado)
                         result && toast((t) => (

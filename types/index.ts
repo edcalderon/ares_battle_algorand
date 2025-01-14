@@ -18,4 +18,4 @@ export type Boss = {
 
 export type Contributor = { address: string; contribution: number };
 
-export type ExplorerActionType = 'account' | 'application' | 'accounts';
+export type ExplorerActionType = 'account' | 'application' | 'accounts' | 'applications' | 'applicationsBox';

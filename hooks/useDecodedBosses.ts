@@ -32,9 +32,9 @@ export const useDecodedBosses = (createdApps: any[]) => {
                 version: decodedState && decodedState.length > 0
                     ? decodedState.find(state => state.key === 'v')?.value
                     : 'Unknown',
-                contributors: decodedState ? decodedState
-                    .filter(state => !['n', 'h', 'th', 'g', 's', 'p', 'v'].includes(state.key))
-                    .map(state => ({ address: state.key, contribution: state.value })) as Contributor[] : []
+                contributors: decodedState && decodedState.length > 0
+                    ? decodedState.find(state => state.key === 'numStakers')?.value
+                    : 'Unknown',
             };
 
             return boss;
