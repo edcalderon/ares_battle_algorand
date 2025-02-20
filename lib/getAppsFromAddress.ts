@@ -1,7 +1,7 @@
 import { getAlgodConfigFromEnvironment } from './getAlgoClientConfigs'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { decodeGlobalState } from './decodeGlobalState'
-import { Contributor } from '@/types'
+import { Boss } from '@/types'
 import algosdk from 'algosdk'
 const algodConfig = getAlgodConfigFromEnvironment()
 const algorand = AlgorandClient.fromConfig({ algodConfig })
@@ -55,18 +55,67 @@ export const getAppGlobalStateContributorsToBossFormat = async (appId: bigint): 
     }
 };
 
+export const getAppGlobalStateToBossFormat = async (appId: bigint): Promise<any> => {
+    try {
+        const appInfo = await algorand.client.algod.getApplicationByID(appId).do();
+
+        if (!appInfo) return null; // Return null if appInfo is not found
+
+        const decodedState = decodeGlobalState(appInfo.params.globalState as any).decodedStates;
+
+        const boss: Boss = {
+            id: parseInt(appId.toString()),
+            name: decodedState && decodedState.length > 0
+                ? String(decodedState.find(state => state.key === 'n')?.value).replace(/[^a-zA-Z0-9]/g, '')
+                : 'Unknown',
+            health: decodedState && decodedState.length > 0
+                ? decodedState.find(state => state.key === 'h')?.value
+                : 'Unknown',
+            maxHealth: decodedState && decodedState.length > 0
+                ? decodedState.find(state => state.key === 'th')?.value
+                : 'Unknown',
+            governor: decodedState && decodedState.length > 0
+                ? decodedState.find(state => state.key === 'g')?.value
+                : 'Unknown',
+            status: decodedState && decodedState.length > 0
+                ? decodedState.find(state => state.key === 's')?.value
+                : 'Unknown',
+            pool: decodedState && decodedState.length > 0
+                ? decodedState.find(state => state.key === 'p')?.value
+                : 'Unknown',
+            version: decodedState && decodedState.length > 0
+                ? decodedState.find(state => state.key === 'v')?.value
+                : 'Unknown',
+            contributors: decodedState && decodedState.length > 0
+                ? decodedState.find(state => state.key === 'numStakers')?.value
+                : 'Unknown',
+            topAccounts: decodedState && decodedState.length > 0
+                ? [
+                    decodedState.find(state => state.key === 't1')?.value,
+                    decodedState.find(state => state.key === 't2')?.value,
+                    decodedState.find(state => state.key === 't3')?.value
+                ].filter(Boolean)
+                : [],
+        };
+        return boss;
+    } catch (error) {
+        console.error("Error fetching app global state:", error);
+        return null;
+    }
+};
+
 
 export const getAppBoxToBossFormat = async (appId: bigint, name: Uint8Array): Promise<any> => {
     try {
         const boxesResponse = await algorand.client.algod.getApplicationBoxByName(appId, name).do();
 
         const numStakers = await getAppGlobalStateContributorsToBossFormat(appId)
-    
+
         // Define the empty box matrix
         const emptyBoxMatrix = new Uint8Array([...Array(1280)].map(() => 0x41)); // 1280 bytes of 'A'
 
         const CompareEmptyBoxMatrix = Buffer.from(emptyBoxMatrix).toString('utf-8')
-        const CompareResponseBoxMatrix =  Buffer.from(boxesResponse.value).toString('base64')
+        const CompareResponseBoxMatrix = Buffer.from(boxesResponse.value).toString('base64')
 
         // Compare response to the empty box matrix
         if (boxesResponse.value && CompareEmptyBoxMatrix != CompareResponseBoxMatrix) {
@@ -80,14 +129,14 @@ export const getAppBoxToBossFormat = async (appId: bigint, name: Uint8Array): Pr
 
                 formattedDataArray.push({ address, contribution: parseInt(contribution.toString()), entryRound });
             }
-            return formattedDataArray; 
+            return formattedDataArray;
         }
 
         return null; // Return null if the box is empty
 
     } catch (error) {
         console.error("Error fetching app:", error);
-        return null; 
+        return null;
     }
 };
 

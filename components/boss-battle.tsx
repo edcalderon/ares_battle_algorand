@@ -29,15 +29,16 @@ import { getAlgorandApiUrl } from '@/lib/getAlgorandUrl';
 import { SearchIcon } from '@/lib/icons';
 import { AresBattleClient } from '@/artifacts/AresBattleClient';
 import { getAlgodConfigFromEnvironment } from '../lib/getAlgoClientConfigs'
-import { AlgorandClient, microAlgos } from '@algorandfoundation/algokit-utils'
+import { algo, AlgorandClient, microAlgos } from '@algorandfoundation/algokit-utils'
 import toast from 'react-hot-toast'
 import { Contributor } from '@/types';
 import { useAsyncList } from "@react-stately/data";
 import { SortDescriptor } from "@react-types/shared";
 import { getAppBoxToBossFormat } from '@/lib/getAppsFromAddress';
+import { getAppGlobalStateToBossFormat } from '@/lib/getAppsFromAddress';
 
-export default function BossBattle({ id, name, governor, status, version, health, maxHealth, pool, contributors }: any) {
-    const { transactionSigner, activeAddress } = useWallet()
+export default function BossBattle({ id, name, governor, status, version, health, maxHealth, pool, contributors, topAccounts }: any) {
+    const { transactionSigner, activeAddress, signTransactions } = useWallet()
     const [slashAbilityPoints, setSlashAbilityPoints] = useState(1);
     const [selectedAbility, setSelectedAbility] = useState('');
     const [abilityCost, setAbilityCost] = useState(0);
@@ -52,6 +53,7 @@ export default function BossBattle({ id, name, governor, status, version, health
     const [recentActions, setRecentActions] = useState<any[]>([]);
     const [isLoadingRecentActions, setIsLoadingRecentActions] = useState(false);
     const [currentContributors, setCurrentContributors] = useState<number>(contributors);
+    const [currentTopAccounts, setCurrentTopAccounts] = useState<any[]>(topAccounts);
     const [resentAction, setResentAction] = useState<[contributor: Contributor, action: string]>();
     const [currentPool, setCurrentPool] = useState<number>(pool);
     const [isLoadingTable, setIsLoadingTable] = React.useState(true);
@@ -68,9 +70,12 @@ export default function BossBattle({ id, name, governor, status, version, health
 
     useEffect(() => {
         const updateState = async () => {
-            setCurrentHealth(health)
+            const appInfo = await getAppGlobalStateToBossFormat(id)
+            setCurrentHealth(appInfo.health)
             setCurrentPool(await getPoolBalanceFromAppAdress())
-            setCurrentContributors(contributors)
+            setCurrentContributors(appInfo.contributors)
+            setCurrentTopAccounts(appInfo.topAccounts)
+            console.log(appInfo.topAccounts)
             list.reload()
         }
         updateState()
@@ -107,8 +112,6 @@ export default function BossBattle({ id, name, governor, status, version, health
         try {
             let result;
             let healthChange = 0;
-            let contributionChange = 0;
-
             switch (selectedAbility) {
                 case 'SLASH':
                     const dtxn = await algorand.createTransaction.payment({
@@ -119,9 +122,11 @@ export default function BossBattle({ id, name, governor, status, version, health
                         //extraFee: microAlgos(7_000)
                     });
                     const prefix = new Uint8Array(Buffer.from("stakers"))
-                    result = await client.send.slash({ args: { damagePayment: dtxn, times: BigInt(slashAbilityPoints) }, sender: sender.addr.toString(), boxReferences: [{ name: prefix, appId: client.appId }], extraFee: microAlgos(8_000) });
+                    let foreignAccounts = currentTopAccounts
+                    console.log("****accotuns***")
+                    console.log(foreignAccounts)
+                    result = await client.send.slash({ args: { damagePayment: dtxn, times: BigInt(slashAbilityPoints) }, sender: sender.addr.toString(), boxReferences: [{ name: prefix, appId: client.appId }], extraFee: microAlgos(8_000), signer: sender, accountReferences: foreignAccounts });
                     healthChange -= slashAbilityPoints;
-                    contributionChange = slashAbilityPoints;
                     break;
                 case 'HEAL':
                     const htxn = await algorand.createTransaction.payment({
@@ -266,7 +271,7 @@ export default function BossBattle({ id, name, governor, status, version, health
 
     const rowsPerPage = 5;
     const pages = React.useMemo(() => {
-        return list?.items.length ? Math.ceil(list.items.length / rowsPerPage): 0;
+        return list?.items.length ? Math.ceil(list.items.length / rowsPerPage) : 0;
     }, [list?.items.length, rowsPerPage]);
 
     const loadingState = isLoadingTable || list?.items.length === 0 ? "loading" : "idle";

@@ -14,6 +14,7 @@ export type Boss = {
   pool: any;
   version: any;
   contributors: Contributor[];
+  topAccounts: any[];
 };
 
 export type Contributor = { address: string; contribution: number };

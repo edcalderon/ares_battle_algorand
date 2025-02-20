@@ -22,13 +22,14 @@ import {
 } from "@nextui-org/react";
 import type { Boss } from 'types'
 import CreateBossModal from './create-boss-modal';
-import { getExplorerUrl } from '@/lib/getAlgorandUrl';
 import { allCollection } from 'greek-mythology-data';
 import { VerticalDotsIcon, SearchIcon, PlusIcon } from "@/lib/icons";
 import { AresBattleClient } from '@/artifacts/AresBattleClient';
 import { getAlgodConfigFromEnvironment } from '../lib/getAlgoClientConfigs'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { useWallet as useWalletReact } from '@txnlab/use-wallet-react'
+import Link from 'next/link';
+import { useLocale } from "next-intl";
 
 export const columns = [
   { name: "ID", uid: "id", sortable: true },
@@ -58,6 +59,7 @@ export default function BossTable({ bosses }: { bosses: Boss[] }) {
   const algodConfig = getAlgodConfigFromEnvironment()
   const algorand = AlgorandClient.fromConfig({ algodConfig })
   algorand.setDefaultSigner(transactionSigner)
+  const locale = useLocale();
 
   const filteredItems = React.useMemo(() => {
     return bosses.filter((boss: any) =>
@@ -245,9 +247,9 @@ export default function BossTable({ bosses }: { bosses: Boss[] }) {
                     );
                   default:
                     return <TableCell>
-                      <a href={getExplorerUrl(item.id.toString(), 'application')} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
+                      <Link href={`/boss/${item.id}`} passHref>
                         {item.id.toString()}
-                      </a>
+                      </Link>
                     </TableCell>;
                 }
               }}

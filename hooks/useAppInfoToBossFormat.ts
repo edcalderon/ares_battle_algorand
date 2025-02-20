@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getAppInfo } from '@/lib/getAppsFromAddress';
 import { decodeGlobalState } from '@/lib/decodeGlobalState';
-import type { Boss, Contributor } from '@/types';
+import type { Boss } from '@/types';
 
 const useAppInfoToBossFormat = (appId: bigint) => {
     const [decodedBossInfo, setDecodedBossInfo] = useState<Boss>();
@@ -46,13 +46,20 @@ const useAppInfoToBossFormat = (appId: bigint) => {
                     version: decodedState && decodedState.length > 0
                         ? decodedState.find(state => state.key === 'v')?.value
                         : 'Unknown',
-                    contributors: decodedState ? decodedState
-                        .filter(state => !['n', 'h', 'th', 'g', 's', 'p', 'v'].includes(state.key))
-                        .map(state => ({ address: state.key, contribution: state.value })) as Contributor[] : []
+                    contributors: decodedState && decodedState.length > 0
+                        ? decodedState.find(state => state.key === 'numStakers')?.value
+                        : 'Unknown',
+                    topAccounts: decodedState && decodedState.length > 0
+                        ? [
+                            decodedState.find(state => state.key === 't1')?.value,
+                            decodedState.find(state => state.key === 't2')?.value,
+                            decodedState.find(state => state.key === 't3')?.value
+                        ].filter(Boolean)
+                        : [],
                 }
             })[0];
             setDecodedBossInfo(decodedAppsFormatedToBoss);
-        }).finally(()=>{
+        }).finally(() => {
             setLoadingCreatedApps(false);
         });
 

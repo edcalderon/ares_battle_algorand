@@ -57,6 +57,8 @@ export default function Dashboard() {
                                 governor={createdBosses[currentIndex].governor}
                                 pool={createdBosses[currentIndex].pool}
                                 contributors={createdBosses[currentIndex].contributors}
+                                topAccounts={createdBosses[currentIndex].topAccounts}
+                                
                             />
                             <div
                                 className="cursor-pointer w-16 h-full flex items-center justify-center"

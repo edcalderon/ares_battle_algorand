@@ -35,6 +35,13 @@ export const useDecodedBosses = (createdApps: any[]) => {
                 contributors: decodedState && decodedState.length > 0
                     ? decodedState.find(state => state.key === 'numStakers')?.value
                     : 'Unknown',
+                topAccounts: decodedState && decodedState.length > 0
+                    ? [
+                        decodedState.find(state => state.key === 't1')?.value,
+                        decodedState.find(state => state.key === 't2')?.value,
+                        decodedState.find(state => state.key === 't3')?.value
+                      ].filter(Boolean)
+                    : [],
             };
 
             return boss;

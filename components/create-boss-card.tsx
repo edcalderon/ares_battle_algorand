@@ -38,9 +38,9 @@ export default function CreateBossCard() {
                 const suggestedParams = await algorand.getSuggestedParams();
                 return algosdk.makePaymentTxnWithSuggestedParamsFromObject({
                     sender,
-                    receiver, // Sending to self for funding
-                    amount, // Amount to send
-                    suggestedParams // Use fetched params
+                    receiver,
+                    amount, 
+                    suggestedParams
                 });
             }
 
@@ -143,7 +143,7 @@ export default function CreateBossCard() {
                                 {(god) => <SelectItem key={god.name}>{god.name}</SelectItem>}
                             </Select>
                             <Select
-                                items={[{ value: '2500' }, { value: '5000' }, { value: '10000' }]}
+                                items={[{ value: '5' }, { value: '10' }, { value: '15' }]}
                                 key='outside'
                                 label="Healt"
                                 placeholder="Select initial healt"
